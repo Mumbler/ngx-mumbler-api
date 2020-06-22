@@ -5,10 +5,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { InjectionToken } from '@angular/core';
 import { HexString, UuidHexString } from './common.types';
+import { LogLevel } from '../services/common/logger.enum';
 
 export class ExtendedCommunicationParameter {
 
 	private _debugMode: boolean = false;
+	private _logLevel: LogLevel = LogLevel.OFF;
 	private _serverUrl: string = `https://api.mumbler.eu`;
 
 	public get debugMode(): boolean {
@@ -20,6 +22,18 @@ export class ExtendedCommunicationParameter {
 	public set debugMode( value: boolean ) {
 
 		this._debugMode = value;
+
+	}
+
+	public get logLevel(): LogLevel {
+
+		return this._logLevel;
+
+	}
+
+	public set logLevel( value: LogLevel ) {
+
+		this._logLevel = value;
 
 	}
 

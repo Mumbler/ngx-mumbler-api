@@ -3,48 +3,51 @@
 ************* All rights reserved **************
 ************************************************/
 
-import { ModuleWithProviders, NgModule } from '@angular/core';
+import { Inject, InjectionToken, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModuleConfigService } from './services/config/module-config.service';
 import { CommunicationService } from './services/communication/communication.service';
 import { CryptoService } from './services/crypto/crypto.service';
 import { MessagesService } from './services/messages/messages.service';
-import { CommunicationParameter, communicationParameterFactory, communicationParameterInjectionToken } from './common/communication-parameter.class';
 import { ChannelConfigService } from './services/config/channel-config.service';
 import { CryptoConfigService } from './services/config/crypto-config.service';
+import { HttpClientModule } from '@angular/common/http';
+import { LoggerService } from './services/common/logger.service';
+
+export const communicationInjectionToken: InjectionToken< CommunicationModule > =
+    new InjectionToken< CommunicationModule >( 'Communication injection token' );
+
 
 @NgModule( {
 	declarations: [],
 	imports: [
-		CommonModule
+		CommonModule,
+		HttpClientModule
+	],
+	providers: [
+		LoggerService,
+		ModuleConfigService,
+		ChannelConfigService,
+		CryptoConfigService,
+		CommunicationService,
+		CryptoService,
+		MessagesService,
 	],
 	exports: [
 		/* TODO: Which service shall be exported? */
 	]
 } )
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class CommunicationModule {
 
-	public static WithParameter( communicationParameter?: CommunicationParameter ): ModuleWithProviders {
+	public constructor(
+		private readonly _loggerService: LoggerService,
+		private readonly _moduleConfigService: ModuleConfigService
+	) {
 
-		return {
-
-			ngModule: CommunicationModule,
-			providers: [
-				ModuleConfigService,
-				ChannelConfigService,
-				CryptoConfigService,
-				CommunicationService,
-				CryptoService,
-				MessagesService,
-				{
-					provide: communicationParameterInjectionToken,
-					// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-					useFactory: () => communicationParameterFactory( communicationParameter ),
-				}
-			]
-
-		};
+		this._loggerService.debug( `Starting CommunicationModule with parameter:`, 'CommunicationModule' );
+		this._loggerService.verbose( `\tServer url: "${ this._moduleConfigService.serverUrl }"`, 'CommunicationModule' );
+		this._loggerService.verbose( `\tDebug mode: "${ this._moduleConfigService.debugMode ? 'ON' : 'OFF' }"`, 'CommunicationModule' );
+		this._loggerService.verbose( `\tLog level: "${ this._loggerService.logLevel }"`, 'CommunicationModule' );
 
 	}
 

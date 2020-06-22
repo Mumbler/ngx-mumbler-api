@@ -2,17 +2,15 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { Injectable } from '@angular/core';
 
-@Injectable( {
-	providedIn: 'root'
-} )
-export class MessagesService {
+export enum LogLevel {
 
-	public constructor(
-
-	) {
-
-	}
+	ALL = 0,
+	DEBUG = 1,
+	VERBOSE = 2,
+	WARN = 3,
+	ERROR = 4,
+	FATAL = 5,
+	OFF = 6
 
 }
