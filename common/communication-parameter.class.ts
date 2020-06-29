@@ -51,11 +51,42 @@ export class ExtendedCommunicationParameter {
 
 }
 
+export class CryptoCommunicationParameter {
+
+	private _privateKey: Uint8Array;
+	private _totpKey: Uint8Array;
+
+	public get privateKey(): Uint8Array {
+
+		return this._privateKey;
+
+	}
+
+	public set privateKey( value: Uint8Array ) {
+
+		this._privateKey = value;
+
+	}
+
+	public get totpKey(): Uint8Array {
+
+		return this._totpKey;
+
+	}
+
+	public set totpKey( value: Uint8Array ) {
+
+		this._totpKey = value;
+
+	}
+
+}
+
 export class CommunicationParameter {
 
 	public constructor(
 		private readonly _channelId: UuidHexString,
-		private readonly _privateKey: HexString,
+		private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
 		private readonly _extendedCommunicationParameter: ExtendedCommunicationParameter = new ExtendedCommunicationParameter()
 	){}
 
@@ -65,15 +96,15 @@ export class CommunicationParameter {
 
 	}
 
-	public get extendedCommunicationParameter(): ExtendedCommunicationParameter {
+	public get crpytoCommunicationParameter(): CryptoCommunicationParameter {
 
-		return this._extendedCommunicationParameter;
+		return this._cryptoCommunicationParameter;
 
 	}
 
-	public get privateKey(): HexString {
+	public get extendedCommunicationParameter(): ExtendedCommunicationParameter {
 
-		return this._privateKey;
+		return this._extendedCommunicationParameter;
 
 	}
 

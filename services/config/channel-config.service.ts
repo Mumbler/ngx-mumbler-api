@@ -12,26 +12,18 @@ import { CommunicationParameter, communicationParameterInjectionToken } from '..
 export class ChannelConfigService {
 
 	private readonly _channelId: UuidHexString;
-	private readonly _privateKey: HexString;
 
 	public constructor(
 		@Inject( communicationParameterInjectionToken ) private readonly _communicationParameter: CommunicationParameter
 	) {
 
 	    this._channelId = this._communicationParameter.channelId;
-	    this._privateKey = this._communicationParameter.privateKey;
 
 	}
 
 	public get channelId(): UuidHexString {
 
 		return this._channelId;
-
-	}
-
-	public get privateKey(): HexString {
-
-		return this._privateKey;
 
 	}
 

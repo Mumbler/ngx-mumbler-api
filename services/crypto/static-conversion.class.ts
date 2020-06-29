@@ -2,6 +2,7 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
+import { HexString } from '../../common/common.types';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StaticConversion {
@@ -119,6 +120,20 @@ export class StaticConversion {
 		}
 
 		return value;
+
+	}
+
+	public static ConvertHexStringToBuffer( raw: HexString ): Uint8Array {
+
+		const buffer: Uint8Array = new Uint8Array( new ArrayBuffer( raw.length ) );
+
+		for ( let i: number = 0; i < raw.length; i++ ) {
+
+			buffer[ i ] = Math.abs( Number.parseInt( raw[ i ], 16 ) );
+
+		}
+
+		return buffer;
 
 	}
 

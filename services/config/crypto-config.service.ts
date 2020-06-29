@@ -28,9 +28,26 @@ export class CryptoConfigService {
 	private _synchronousAlgorithm: string = 'AES-CBC';
 	private _synchronousLength: number = 256;
 
-	public constructor(
-		@Inject( communicationParameterInjectionToken ) private readonly _communicationParameter: CommunicationParameter
-	){}
+	// TOTP HMAC Algorithm name
+	private _totpAlgorithm: string = 'HMAC';
+
+	public get asynchronousAlgorithm(): string {
+
+		return this._asynchronousAlgorithm;
+
+	}
+
+	public get asynchronousLength(): number {
+
+		return this._asynchronousLength;
+
+	}
+
+	public get asynchronousPublicExponent(): Uint8Array {
+
+		return this._asynchronousPublicExponent;
+
+	}
 
 	public get deriveAlgorithm(): string {
 
@@ -62,21 +79,9 @@ export class CryptoConfigService {
 
 	}
 
-	public get asynchronousAlgorithm(): string {
+	public get totpAlgorithm(): string {
 
-		return this._asynchronousAlgorithm;
-
-	}
-
-	public get asynchronousLength(): number {
-
-		return this._asynchronousLength;
-
-	}
-
-	public get asynchronousPublicExponent(): Uint8Array {
-
-		return this._asynchronousPublicExponent;
+		return this._totpAlgorithm;
 
 	}
 
