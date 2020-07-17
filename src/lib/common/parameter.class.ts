@@ -2,16 +2,17 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { InjectionToken } from '@angular/core';
-import { HexString, UuidHexString } from './common.types';
 import { LogLevel } from '../services/common/logger.enum';
+import { MumblerId } from '../services/types/mumbler-id.type';
 
 export class ExtendedCommunicationParameter {
 
 	private _debugMode: boolean = false;
 	private _logLevel: LogLevel = LogLevel.OFF;
-	private _serverUrl: string = `https://api.mumbler.eu`;
+	private _serverUrl: string = 'http://localhost:5000';
+	private _socketUrl: string = 'ws://localhost:5000';
 
 	public get debugMode(): boolean {
 
@@ -49,6 +50,18 @@ export class ExtendedCommunicationParameter {
 
 	}
 
+	public get socketUrl(): string {
+
+		return this._socketUrl;
+
+	}
+
+	public set socketUrl( value: string ) {
+
+		this._socketUrl = value;
+
+	}
+
 }
 
 export class CryptoCommunicationParameter {
@@ -82,17 +95,23 @@ export class CryptoCommunicationParameter {
 
 }
 
-export class CommunicationParameter {
+export class MumblerParameter {
 
 	public constructor(
-		private readonly _channelId: UuidHexString,
+		private _mumblerId: MumblerId = uuidV4(),
 		private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
 		private readonly _extendedCommunicationParameter: ExtendedCommunicationParameter = new ExtendedCommunicationParameter()
 	){}
 
-	public get channelId(): UuidHexString {
+	public get mumblerId(): MumblerId {
 
-		return this._channelId;
+		return this._mumblerId;
+
+	}
+
+	public set mumblerId( value: MumblerId ) {
+
+		this._mumblerId = value;
 
 	}
 
@@ -102,7 +121,7 @@ export class CommunicationParameter {
 
 	}
 
-	public get extendedCommunicationParameter(): ExtendedCommunicationParameter {
+	public get extendedDelegationParameter(): ExtendedCommunicationParameter {
 
 		return this._extendedCommunicationParameter;
 
@@ -110,7 +129,7 @@ export class CommunicationParameter {
 
 }
 
-export const communicationParameterFactory: ( parameter?: CommunicationParameter )=> CommunicationParameter = ( parameter?: CommunicationParameter ) => {
+export const mumblerParameterFactory: ( parameter?: MumblerParameter )=> MumblerParameter = ( parameter?: MumblerParameter ) => {
 
 	// Use provided
 	if ( !! parameter ) {
@@ -120,11 +139,11 @@ export const communicationParameterFactory: ( parameter?: CommunicationParameter
 	}
 
 	// Use default
-	return new CommunicationParameter( uuidv4() as unknown as UuidHexString, null, new ExtendedCommunicationParameter() );
+	return new MumblerParameter( uuidV4(), null, new ExtendedCommunicationParameter() );
 
 };
 
-export const communicationParameterInjectionToken: InjectionToken< CommunicationParameter > =
-    new InjectionToken< CommunicationParameter >(
+export const mumblerParameterInjectionToken: InjectionToken< MumblerParameter > =
+    new InjectionToken< MumblerParameter >(
 	    'Communication parameter injection token'
     );
