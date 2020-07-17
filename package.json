@@ -1,15 +1,30 @@
 {
-    "name"            : "mumbler-communication-client",
-    "version"         : "1.0.0",
-    "description"     : "A client module which allows to open, maintaine and communicate with various mumbler channel(s)",
-    "main"            : "communication.module.ts",
-    "scripts"         : {
+    "name": "mumbler-api-ts",
+    "version": "1.0.0",
+    "description": "An Angular client module which allows to open, maintaine and communicate with various mumbler(s)",
+    "main": "mumbler.module.ts",
+    "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author"          : "DI Xaver M. Kienzerle - mumbler gmbh",
-    "license"         : "ISC",
+    "author": "DI Xaver M. Kienzerle - mumbler gmbh",
+    "license": "ISC",
     "peerDependencies": {
-        "@angular/core": "^9.1.11",
-        "uuid"         : "^8.1.0"
+        "@angular/core": "^10.0.0",
+        "uuid": "^8.1.0"
+    },
+    "devDependencies": {
+        "@angular/core": "^10.0.0",
+        "@typescript-eslint/eslint-plugin": "^2.34.0",
+        "@typescript-eslint/parser": "^2.34.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.10.0",
+        "eslint-plugin-header": "^3.0.0",
+        "eslint-plugin-import": "^2.20.1",
+        "prettier": "^1.19.1",
+        "ts-loader": "^6.2.1",
+        "ts-node": "^8.6.2",
+        "tsconfig-paths": "^3.9.0",
+        "typescript": "^3.9.3",
+        "uuid": "^8.1.0"
     }
 }
