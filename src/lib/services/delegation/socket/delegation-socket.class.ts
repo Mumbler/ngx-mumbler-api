@@ -4,6 +4,7 @@
 ************************************************/
 import { EMPTY, Observable, Subscriber, throwError } from 'rxjs';
 import { Mumble } from './delegation.mumble.class';
+import { MumblerIdPayload } from '../../mumble/payload/mumbler-id.payload';
 
 export class DelegationSocket extends Observable< Mumble > {
 
@@ -32,13 +33,15 @@ export class DelegationSocket extends Observable< Mumble > {
 
 			this._socket.onmessage = ( event: MessageEvent ) => {
 
-				// Try to de-serialize the channelMessage
-				const channelMessage: Mumble = Mumble.FromJson( event.data );
+				try {
 
-				// When channelMessage !== null then the de-serialization succeeded (otherwise ignore the message)
-				if ( !! channelMessage ) {
+				    // Try to de-serialize the mumble
+					// TODO: Implement de-serialization?
+					subscriber.next( event.data as Mumble );
 
-					subscriber.next( channelMessage );
+				} catch ( e ) {
+
+					subscriber.error( `Unable to de-serialize mumble` );
 
 				}
 
@@ -66,14 +69,15 @@ export class DelegationSocket extends Observable< Mumble > {
 
 	}
 
-	public sendMessage( message: Mumble ): Observable< never > {
+	public sendMessage( mumble: Mumble ): Observable< never > {
 
-		if ( !! message ) {
+		if ( !! mumble ) {
 
 			// Enforce the sender
-			message.senderChannelId = this._mumblerId;
+			mumble.mumblerId = new MumblerIdPayload( this._mumblerId );
 
-			this._socket.send( message.toJson() );
+			// Try to delegate ("send") the mumble
+			this._socket.send( JSON.stringify( mumble ) );
 
 			return EMPTY;
 

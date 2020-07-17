@@ -2,7 +2,6 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { v4 as uuidV4 } from 'uuid';
 import { InjectionToken } from '@angular/core';
 import { LogLevel } from '../services/common/logger.enum';
 import { MumblerId } from '../services/types/mumbler-id.type';
@@ -98,7 +97,7 @@ export class CryptoCommunicationParameter {
 export class MumblerParameter {
 
 	public constructor(
-		private _mumblerId: MumblerId = uuidV4(),
+		private _mumblerId: MumblerId,
 		private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
 		private readonly _extendedCommunicationParameter: ExtendedCommunicationParameter = new ExtendedCommunicationParameter()
 	){}
@@ -139,7 +138,7 @@ export const mumblerParameterFactory: ( parameter?: MumblerParameter )=> Mumbler
 	}
 
 	// Use default
-	return new MumblerParameter( uuidV4(), null, new ExtendedCommunicationParameter() );
+	return new MumblerParameter( null, null, new ExtendedCommunicationParameter() );
 
 };
 

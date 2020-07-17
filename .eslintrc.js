@@ -1,7 +1,7 @@
 module.exports = {
     parser: '@typescript-eslint/parser',
     parserOptions: {
-        project: './tsconfig.lib.json',
+        project: './projects/ngx-mumbler-api/tsconfig.lib.json',
         sourceType: 'module'
     },
     plugins: [
