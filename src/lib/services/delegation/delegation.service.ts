@@ -53,7 +53,7 @@ export class DelegationService {
 
 	        switchMap( ( totp: string ) => {
 
-	            const channel: DelegationSocket = new DelegationSocket( socketId, totp, `${ this._moduleConfigService.socketUrl }channels` );
+	            const channel: DelegationSocket = new DelegationSocket( socketId, totp, `${ this._moduleConfigService.socketUrl }delegation` );
 
 	            this._sockets.push( channel );
 
@@ -61,7 +61,7 @@ export class DelegationService {
 
 			} ),
 
-			tap( ( message: Mumble ) => this._loggerService.debug( `Received ${ message.toString() }`, 'DelegationService' ) ),
+			tap( () => this._loggerService.debug( `Received mumble`, 'DelegationService' ) ),
 
 			catchError( ( err: unknown ) => {
 

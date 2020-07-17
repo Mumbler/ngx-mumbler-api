@@ -2,7 +2,7 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { HexString } from '../../common/common.types';
+import { HexString } from '../../common/conversion.class';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StaticConversion {
@@ -74,7 +74,9 @@ export class StaticConversion {
 
 	}
 
-	public static ConvertBufferToBase64( buffer: Uint8Array ): string {
+	public static ConvertBufferToBase64( buffer: ArrayBuffer | Uint8Array ): string {
+
+		const viewer: Uint8Array = buffer instanceof ArrayBuffer ? new Uint8Array( buffer ) : buffer;
 
 		/*
          * Based on the work of https://github.com/niklasvh/base64-arraybuffer
@@ -85,20 +87,20 @@ export class StaticConversion {
 
 		let base64: string = '';
 
-		for ( let i: number  = 0; i < buffer.length; i += 3 ) {
+		for ( let i: number  = 0; i < viewer.length; i += 3 ) {
 
-			base64 += b64Chars[ buffer[ i ] >> 2 ];
-			base64 += b64Chars[ ( buffer[ i ] & 3 ) << 4 | buffer[ i + 1 ] >> 4 ];
-			base64 += b64Chars[ ( buffer[ i + 1 ] & 15 ) << 2 | buffer[ i + 2 ] >> 6 ];
-			base64 += b64Chars[ buffer[ i + 2 ] & 63 ];
+			base64 += b64Chars[ viewer[ i ] >> 2 ];
+			base64 += b64Chars[ ( viewer[ i ] & 3 ) << 4 | viewer[ i + 1 ] >> 4 ];
+			base64 += b64Chars[ ( viewer[ i + 1 ] & 15 ) << 2 | viewer[ i + 2 ] >> 6 ];
+			base64 += b64Chars[ viewer[ i + 2 ] & 63 ];
 
 		}
 
-		if ( buffer.length % 3 === 2 ) {
+		if ( viewer.length % 3 === 2 ) {
 
 			base64 = base64.substring( 0, base64.length - 1 ) + '=';
 
-		} else if ( buffer.length % 3 === 1 ) {
+		} else if ( viewer.length % 3 === 1 ) {
 
 			base64 = base64.substring( 0, base64.length - 2 ) + '==';
 

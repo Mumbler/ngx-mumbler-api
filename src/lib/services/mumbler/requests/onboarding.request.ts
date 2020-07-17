@@ -6,15 +6,15 @@ import { BaseRequest } from './base.request';
 
 export class OnboardingRequest extends BaseRequest {
 
-	public mumblerName: string;
-	public publicKey: string;
+	public name: string;
+	public public: string;
 
 	public constructor( mumblerName: string, publicKey: string ) {
 
 	    super();
 
-		this.mumblerName = mumblerName;
-		this.publicKey = publicKey;
+		this.name = mumblerName;
+		this.public = publicKey;
 
 	}
 

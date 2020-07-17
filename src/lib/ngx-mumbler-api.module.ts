@@ -48,6 +48,7 @@ export class MumblerModule {
 
 		this._loggerService.debug( `Starting "ngx-mumbler-api" with parameter:`, 'MumblerModule' );
 		this._loggerService.verbose( `\tServer url: "${ this._moduleConfigService.serverUrl }"`, 'MumblerModule' );
+		this._loggerService.verbose( `\tSocket url: "${ this._moduleConfigService.socketUrl }"`, 'MumblerModule' );
 		this._loggerService.verbose( `\tDebug mode: "${ this._moduleConfigService.debugMode ? 'ON' : 'OFF' }"`, 'MumblerModule' );
 		this._loggerService.verbose( `\tLog level: "${ this._loggerService.logLevel }"`, 'MumblerModule' );
 

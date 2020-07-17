@@ -23,23 +23,15 @@ enum CryptoKeyType {
 
 export class EncryptedPayload {
 
-	public constructor( private readonly _data: Uint8Array, private readonly _iv: Uint8Array, private readonly _key: Uint8Array ) {}
+	public data: Uint8Array;
+	public iv: Uint8Array;
+	public key: Uint8Array;
 
-	public get data(): Uint8Array {
+	public constructor( data: Uint8Array, iv: Uint8Array, key: Uint8Array ) {
 
-		return this._data;
-
-	}
-
-	public get iv(): Uint8Array {
-
-		return this._iv;
-
-	}
-
-	public get key(): Uint8Array {
-
-		return this._key;
+		this.data = data;
+		this.iv = iv;
+		this.key = key;
 
 	}
 
@@ -52,7 +44,6 @@ export class CryptoService {
 
 	private _privateKey: CryptoKey;
 	private readonly _subtle: SubtleCrypto;
-	private _totpKey: CryptoKey;
 
 	public constructor(
 		private readonly _loggerService: LoggerService,
@@ -298,13 +289,13 @@ export class CryptoService {
 
 	}
 
-	public importBondingTotpKey( key: string ): Observable< CryptoKey > {
+	public importBondingTotpKey( key: string|Uint8Array ): Observable< CryptoKey > {
 
 		return fromPromise(
 
 			this._subtle.importKey(
 				'raw',
-				StaticConversion.ConvertStringToBuffer( key ),
+				typeof key === 'string' ? StaticConversion.ConvertStringToBuffer( key ) : key,
 				{ name: this._cryptoConfigService.totpAlgorithm, hash: this._cryptoConfigService.hashAlgorithm },
 				false,
 				[ 'sign' ]
@@ -388,10 +379,7 @@ export class CryptoService {
 
 		} else if ( CryptoKeyType.totp === type ) {
 
-			result = !! this._totpKey ?
-				of( this._totpKey ) :
-				this.loadCryptoKey( this._cryptoConfigService.totpKey, type )
-			;
+			result = this.loadCryptoKey( this._cryptoConfigService.totpKey, type );
 
 		} else {
 
@@ -406,10 +394,6 @@ export class CryptoService {
 	            if ( CryptoKeyType.pkcs8 === type ) {
 
 	                this._privateKey = cryptoKey;
-
-				} else {
-
-	                this._totpKey = cryptoKey;
 
 				}
 
@@ -439,21 +423,38 @@ export class CryptoService {
 
 		} else if ( type === CryptoKeyType.totp ) {
 
-	        importKey = this.decrypt( this._cryptoConfigService.totpKey ).pipe(
+	        if ( !!! this._cryptoConfigService.totpKey ) {
 
-	            switchMap( ( totpKeyData: ArrayBuffer ) => fromPromise(
+	            // Create on fresh => need for initial authentication
+				importKey = fromPromise(
 
-					this._subtle.importKey(
-						'raw',
-						totpKeyData,
+				    this._subtle.generateKey(
 						{ name: this._cryptoConfigService.totpAlgorithm, hash: this._cryptoConfigService.hashAlgorithm },
-						false,
+				        false,
 						[ 'sign' ]
 					)
 
-				) )
+				);
 
-			);
+			} else {
+
+				importKey = this.decrypt( this._cryptoConfigService.totpKey ).pipe(
+
+					switchMap( ( totpKeyData: ArrayBuffer ) => fromPromise(
+
+						this._subtle.importKey(
+							'raw',
+							totpKeyData,
+							{ name: this._cryptoConfigService.totpAlgorithm, hash: this._cryptoConfigService.hashAlgorithm },
+							false,
+							[ 'sign' ]
+						)
+
+					) )
+
+				);
+
+			}
 
 		} else {
 

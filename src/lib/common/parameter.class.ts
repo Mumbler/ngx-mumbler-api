@@ -6,7 +6,7 @@ import { InjectionToken } from '@angular/core';
 import { LogLevel } from '../services/common/logger.enum';
 import { MumblerId } from '../services/types/mumbler-id.type';
 
-export class ExtendedCommunicationParameter {
+export class ExtendedMumblerParameter {
 
 	private _debugMode: boolean = false;
 	private _logLevel: LogLevel = LogLevel.OFF;
@@ -45,7 +45,15 @@ export class ExtendedCommunicationParameter {
 
 	public set serverUrl( value: string ) {
 
-		this._serverUrl = value;
+	    if ( value.lastIndexOf( '/' ) === value.length ) {
+
+			this._serverUrl = value;
+
+		} else {
+
+	        this._serverUrl = `${ value }/`;
+
+		}
 
 	}
 
@@ -57,7 +65,15 @@ export class ExtendedCommunicationParameter {
 
 	public set socketUrl( value: string ) {
 
-		this._socketUrl = value;
+		if ( value.lastIndexOf( '/' ) === value.length ) {
+
+			this._socketUrl = value;
+
+		} else {
+
+			this._socketUrl = `${ value }/`;
+
+		}
 
 	}
 
@@ -99,7 +115,7 @@ export class MumblerParameter {
 	public constructor(
 		private _mumblerId: MumblerId,
 		private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
-		private readonly _extendedCommunicationParameter: ExtendedCommunicationParameter = new ExtendedCommunicationParameter()
+		private readonly _extendedCommunicationParameter: ExtendedMumblerParameter = new ExtendedMumblerParameter()
 	){}
 
 	public get mumblerId(): MumblerId {
@@ -120,7 +136,7 @@ export class MumblerParameter {
 
 	}
 
-	public get extendedDelegationParameter(): ExtendedCommunicationParameter {
+	public get extendedDelegationParameter(): ExtendedMumblerParameter {
 
 		return this._extendedCommunicationParameter;
 
@@ -138,7 +154,7 @@ export const mumblerParameterFactory: ( parameter?: MumblerParameter )=> Mumbler
 	}
 
 	// Use default
-	return new MumblerParameter( null, null, new ExtendedCommunicationParameter() );
+	return new MumblerParameter( null, null, new ExtendedMumblerParameter() );
 
 };
 

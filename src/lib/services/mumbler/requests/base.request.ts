@@ -4,7 +4,7 @@
 ************************************************/
 export class BaseRequest {
 
-	public readonly date: number = Date.now();
+	public readonly time: number = Date.now();
 	public readonly version: number;
 
 	public constructor( version: number = 1 ) {

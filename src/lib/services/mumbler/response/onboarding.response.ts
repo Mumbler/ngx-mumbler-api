@@ -6,7 +6,7 @@ import { BaseResponse } from './base.response';
 
 export class OnboardingResponse extends BaseResponse {
 
-    public mumblerId: string;
-	public totpKey: string;
+	public mumblerId: string;
+	public totp: string;
 
 }

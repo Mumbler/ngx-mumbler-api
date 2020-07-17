@@ -1,18 +1,18 @@
 /***********************************************
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
-************************************************/
+ ************************************************/
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { CryptoKeyPairString, CryptoService, EncryptedPayload } from './crypto.service';
 import {
-	MumblerParameter,
-	mumblerParameterInjectionToken,
-	CryptoCommunicationParameter,
-	ExtendedCommunicationParameter
+    CryptoCommunicationParameter,
+    ExtendedMumblerParameter,
+    MumblerParameter,
+    mumblerParameterInjectionToken
 } from '../../common/parameter.class';
 import { AppService } from '../../../../../app.service';
-import { convertStringToUuidHexString } from '../../common/common.types';
+import { convertStringToUuidHexString } from '../../common/conversion.class';
 import { switchMap, tap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Observable, of } from 'rxjs';
@@ -28,7 +28,7 @@ describe( 'CryptoService', () => {
 
 	const factory: ( appService: AppService )=> Observable< MumblerParameter > = ( appService: AppService ) => {
 
-		const extConfig: ExtendedCommunicationParameter = new ExtendedCommunicationParameter();
+		const extConfig: ExtendedMumblerParameter = new ExtendedMumblerParameter();
 
 		extConfig.logLevel = appService.logLevel;
 		extConfig.debugMode = appService.debugMode;
