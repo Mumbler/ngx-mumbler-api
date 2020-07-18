@@ -1,15 +1,14 @@
 {
-    "name"            : "mumbler-communication-client",
-    "version"         : "1.0.0",
-    "description"     : "A client module which allows to open, maintaine and communicate with various mumbler channel(s)",
-    "main"            : "communication.module.ts",
-    "scripts"         : {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author"          : "DI Xaver M. Kienzerle - mumbler gmbh",
-    "license"         : "ISC",
-    "peerDependencies": {
-        "@angular/core": "^9.1.11",
-        "uuid"         : "^8.1.0"
-    }
+  "name": "ngx-mumbler-api",
+  "version": "1.0.0",
+  "description": "An Angular client module which allows to open, maintaine and communicate with various mumbler(s)",
+  "author": "DI Xaver M. Kienzerle - mumbler gmbh",
+  "license": "ISC",
+  "peerDependencies": {
+    "@angular/common": "^10.0.4",
+    "@angular/core": "^10.0.4"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  }
 }
