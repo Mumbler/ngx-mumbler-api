@@ -3,11 +3,9 @@
 ************* All rights reserved **************
 ************************************************/
 import { BaseResponse } from './base.response';
-import { SerializedEncryptedPayload } from '../../crypto/crypto.service';
 
-export class DelegateToInfoResponse extends BaseResponse {
+export class DelegationResponse extends BaseResponse {
 
-	public name: SerializedEncryptedPayload;
-	public public: string;
+
 
 }

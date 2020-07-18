@@ -11,6 +11,7 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 import { LoggerService } from '../common/logger.service';
 import { DelegationSocket } from './socket/delegation-socket.class';
 import { Mumble } from './socket/delegation.mumble.class';
+import { MumblerService } from '../mumbler/mumbler.service';
 
 @Injectable( {
 	providedIn: 'root'
@@ -20,10 +21,11 @@ export class DelegationService {
 	private readonly _sockets: Array< DelegationSocket > = new Array< DelegationSocket >();
 
 	public constructor(
+		private readonly _cryptoService: CryptoService,
+		private readonly _loggerService: LoggerService,
 	    private readonly _moduleConfigService: ModuleConfigService,
 		private readonly _mumblerConfigService: MumblerConfigService,
-		private readonly _cryptoService: CryptoService,
-		private readonly _loggerService: LoggerService
+		private readonly _mumblerService: MumblerService
 	) {}
 
 	public closeSocket( socketId: string = this._mumblerConfigService.mumblerId ): Observable< never > {
@@ -97,7 +99,8 @@ export class DelegationService {
 
 		}
 
-		return throwError( 'Unable to send message to unknown or closed socket' );
+		// Fallback (no socket available): Send via HTTP-POST
+		return this._mumblerService.sendMumbleViaPost( message );
 
 	}
 

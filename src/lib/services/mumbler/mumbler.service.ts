@@ -3,7 +3,7 @@
 ************* All rights reserved **************
 ************************************************/
 import { Injectable } from '@angular/core';
-import { CryptoKeyPairString, CryptoService } from '../crypto/crypto.service';
+import { CryptoKeyPairString, CryptoService, SerializedEncryptedPayload } from '../crypto/crypto.service';
 import { CryptoConfigService } from '../config/crypto-config.service';
 import { LoggerService } from '../common/logger.service';
 import { EMPTY, forkJoin, Observable, of, Subscriber } from 'rxjs';
@@ -15,7 +15,6 @@ import { HttpClient, HttpEvent, HttpEventType, HttpHeaders } from '@angular/comm
 import { DelegationConfigService } from '../config/delegation-config.service';
 import { BaseResponse } from './response/base.response';
 import { BaseRequest } from './requests/base.request';
-import { PemParser } from '../crypto/pem-parser.class';
 import { MumblerConfigService } from '../config/mumbler-config.service';
 import { InitBondingResponse } from './response/init-bonding.response';
 import { BondingParameterModel } from './model/bonding-parameter.model';
@@ -26,6 +25,9 @@ import { MumblerId } from '../types/mumbler-id.type';
 import { DelegateToInfoResponse } from './response/delegate-to-info.response';
 import { DelegateToInfo } from '../delegation/delegation/delegate-to-info.class';
 import { ModuleConfigService } from '../config/module-config.service';
+import { Mumble } from '../delegation/socket/delegation.mumble.class';
+import { DelegationRequest } from './requests/delegation.request';
+import { DelegationResponse } from './response/delegation.response';
 
 @Injectable( {
 	providedIn: 'root'
@@ -83,8 +85,10 @@ export class MumblerService {
 
 			switchMap( ( response: DelegateToInfoResponse ) => forkJoin( [
 
-				this._cryptoService.decryptBuffer( response.name ),
-				this._cryptoService.decryptBuffer( response.public ),
+				this._cryptoService.decryptBuffer( SerializedEncryptedPayload.ConvertToEncryptedPayload( response.name ) ),
+				of( StaticConversion.ConvertBase64ToBuffer( response.public ) )
+				// TODO: Re-enable server-side encryption when figured out what goes wrong
+				// this._cryptoService.decryptBuffer( SerializedEncryptedPayload.ConvertToEncryptedPayload( response.public ) )
 
 			] ) ),
 
@@ -142,7 +146,7 @@ export class MumblerService {
 
 				return this.post< OnboardingRequest, OnboardingResponse >( 'on-boarding/register/client', new OnboardingRequest(
 					mumbleName,
-					PemParser.AddStartLine( keyPair.publicKey )
+					keyPair.publicKey
 				) );
 
 			} ),
@@ -162,6 +166,18 @@ export class MumblerService {
 			tap( () => this._loggerService.debug( `On-boarding process completed`, 'MumblerService' ) ),
 
 			switchMap( () => EMPTY )
+		);
+
+	}
+
+	public sendMumbleViaPost( message: Mumble ): Observable< never > {
+
+		return this.post< DelegationRequest, DelegationResponse >( 'delegation', new DelegationRequest( message ) ).pipe(
+
+			tap( ( res: DelegationResponse ) => console.log( res ) ),
+
+			switchMap( () => EMPTY )
+
 		);
 
 	}

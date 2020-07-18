@@ -3,9 +3,8 @@
 ************* All rights reserved **************
 ************************************************/
 import { StaticConversion } from './static-conversion.class';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { catchError } from 'rxjs/operators';
 
 export class PemParser {
 

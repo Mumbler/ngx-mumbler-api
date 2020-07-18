@@ -37,6 +37,32 @@ export class EncryptedPayload {
 
 }
 
+export class SerializedEncryptedPayload {
+
+	public data: string;
+	public iv: string;
+	public key: string;
+
+	public constructor( data: string, iv: string, key: string ) {
+
+		this.data = data;
+		this.iv = iv;
+		this.key = key;
+
+	}
+
+	public static ConvertToEncryptedPayload( serialized: SerializedEncryptedPayload ): EncryptedPayload {
+
+	    return new EncryptedPayload(
+	        StaticConversion.ConvertBase64ToBuffer( serialized.data ),
+	        StaticConversion.ConvertBase64ToBuffer( serialized.iv ),
+	        StaticConversion.ConvertBase64ToBuffer( serialized.key ),
+		);
+
+	}
+
+}
+
 @Injectable( {
 	providedIn: 'root'
 } )
@@ -391,6 +417,7 @@ export class CryptoService {
 
 	        tap( ( cryptoKey: CryptoKey ) => {
 
+	            // Only hold the private key... totp will change frequently
 	            if ( CryptoKeyType.pkcs8 === type ) {
 
 	                this._privateKey = cryptoKey;

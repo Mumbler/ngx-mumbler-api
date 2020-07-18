@@ -5,6 +5,7 @@
 import { EMPTY, Observable, Subscriber, throwError } from 'rxjs';
 import { Mumble } from './delegation.mumble.class';
 import { MumblerIdPayload } from '../../mumble/payload/mumbler-id.payload';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 export class DelegationSocket extends Observable< Mumble > {
 
@@ -35,9 +36,19 @@ export class DelegationSocket extends Observable< Mumble > {
 
 				try {
 
-				    // Try to de-serialize the mumble
-					// TODO: Implement de-serialization?
-					subscriber.next( event.data as Mumble );
+				    // Try to de-serialize the mumble (which comes as a blob)
+					const raw: Blob = new Blob( [ event.data ] );
+
+					fromPromise(
+
+						raw.text()
+
+					).subscribe( ( message: string ) => {
+
+					    // Now we can try to parse it into a mumble object (at least the public fields)
+						subscriber.next( JSON.parse( message ) as Mumble );
+
+					} );
 
 				} catch ( e ) {
 
