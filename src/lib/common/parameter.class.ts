@@ -114,6 +114,7 @@ export class MumblerParameter {
 
 	public constructor(
 		private _mumblerId: MumblerId,
+		private _mumblerName: string,
 		private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
 		private readonly _extendedCommunicationParameter: ExtendedMumblerParameter = new ExtendedMumblerParameter()
 	){}
@@ -127,6 +128,18 @@ export class MumblerParameter {
 	public set mumblerId( value: MumblerId ) {
 
 		this._mumblerId = value;
+
+	}
+
+	public get mumblerName(): string {
+
+		return this._mumblerName;
+
+	}
+
+	public set mumblerName( value: string ) {
+
+		this._mumblerName = value;
 
 	}
 
@@ -154,7 +167,7 @@ export const mumblerParameterFactory: ( parameter?: MumblerParameter )=> Mumbler
 	}
 
 	// Use default
-	return new MumblerParameter( null, null, new ExtendedMumblerParameter() );
+	return new MumblerParameter( null, null, null, new ExtendedMumblerParameter() );
 
 };
 
