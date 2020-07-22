@@ -5,13 +5,14 @@
 import { BaseRequest } from './base.request';
 import { MumblerId } from '../../types/mumbler-id.type';
 import { Mumble } from '../../delegation/socket/delegation.mumble.class';
+import { AppsMessage } from '../../mumble/payload/apps/apps-message.abstract';
 
 export class DelegationRequest extends BaseRequest {
 
 	public delegateTo: MumblerId;
+	public delegated: number;
 	public mumblerId: MumblerId;
-	public payload: string;
-	public sent: number;
+	public payload: AppsMessage;
 
 	public constructor( mumble: Mumble ) {
 
@@ -19,6 +20,7 @@ export class DelegationRequest extends BaseRequest {
 
 		this.mumblerId = mumble.mumblerId.mumblerId;
 		this.delegateTo = mumble.transmitPayload.delegateTo;
+		this.delegated = Date.now();
 		this.payload = mumble.transmitPayload.payload;
 
 	}

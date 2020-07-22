@@ -3,7 +3,7 @@
 ************* All rights reserved **************
 ************************************************/
 import { MumblerIdPayload } from '../../mumble/payload/mumbler-id.payload';
-import { TransmitPayload } from '../../mumble/payload/tranmit.payload';
+import { TransmitPayload } from '../../mumble/payload/transmit.payload';
 
 
 export class Mumble {

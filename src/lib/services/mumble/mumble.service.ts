@@ -13,8 +13,9 @@ import { Mumble } from '../delegation/socket/delegation.mumble.class';
 import { MumblerConfigService } from '../config/mumbler-config.service';
 import { MumblerService } from '../mumbler/mumbler.service';
 import { MumblerId } from '../types/mumbler-id.type';
-import { TransmitPayload } from './payload/tranmit.payload';
+import { TransmitPayload } from './payload/transmit.payload';
 import { DelegateToInfo } from '../delegation/delegation/delegate-to-info.class';
+import { AppsDakMessage } from './payload/apps/dienst-am-kunden/apps-dak-message.class';
 
 @Injectable( {
 	providedIn: 'root'
@@ -41,21 +42,63 @@ export class MumbleService {
 
 	}
 
-	public decryptMumblePayload( mumble: Mumble ): Observable< string > {
+	public decryptMumbleContent( mumble: Mumble ): Observable< string > {
 
 		if ( !!! mumble ) {
 
-			return throwError( new Error( 'No channel message to decrypt' ) );
+			return throwError( new Error( 'No mumble message to decrypt' ) );
 
 		}
 
-		this._loggerService.debug( `Starting to decrypt mumble payload`, 'MessagesService' );
+		this._loggerService.debug( `Starting to decrypt mumble content`, 'MessagesService' );
 
-		return this.unwrapEncryptedPayload( mumble.transmitPayload.payload ).pipe(
+		return of( mumble.transmitPayload.payload.content ).pipe(
 
-		    switchMap( ( unwrappedPayload: EncryptedPayload ) => this._cryptoService.decryptBuffer( unwrappedPayload ) ),
+		    switchMap( ( content: EncryptedPayload ) => this._cryptoService.decryptBuffer( content ) ),
 
 			switchMap( ( payload: ArrayBuffer ) => of( StaticConversion.ConvertBufferToString( payload ) ) )
+
+		);
+
+	}
+
+	public decryptMumbleFile( mumble: Mumble, index: number ): Observable< Blob > {
+
+		if ( !!! mumble ) {
+
+			return throwError( new Error( 'No mumble message to decrypt' ) );
+
+		}
+
+		if ( index < 0 || index >= mumble.transmitPayload.payload.files.length ) {
+
+			return throwError( new Error( `File[ ${ index } ] does not exist` ) );
+
+		}
+
+		this._loggerService.debug( `Starting to decrypt mumble content`, 'MessagesService' );
+
+		return of( mumble.transmitPayload.payload.files[ index ] ).pipe(
+
+			switchMap( ( file: EncryptedPayload ) => this._cryptoService.decryptBuffer( file ) ),
+
+			switchMap( ( payload: ArrayBuffer ) => {
+
+				try {
+
+					const blob: Blob = new Blob( [ payload ] );
+
+					this._loggerService.debug( `Successfully create blob for file[ ${ index } ] object`, 'MessagesService' );
+
+					return of( blob );
+
+				} catch ( e ) {
+
+					this._loggerService.warn( `Unable to create blob from file[ ${ index } ]`, 'MessagesService' );
+
+				}
+
+			} )
 
 		);
 
@@ -96,7 +139,7 @@ export class MumbleService {
 
 	}
 
-	public setMumblePayload( mumble: Mumble, delegateToInfo: DelegateToInfo, payload: string ): Observable< Mumble > {
+	public setMumbleContent( mumble: Mumble, delegateToInfo: DelegateToInfo, payload: string, topicId: string = null, index: number = 0 ): Observable< Mumble > {
 
 		if ( !!! mumble || !!! delegateToInfo || !!! payload ) {
 
@@ -108,16 +151,14 @@ export class MumbleService {
 
 			switchMap( ( delegateToKey: CryptoKey ) => this._cryptoService.encryptPayload( delegateToKey, StaticConversion.ConvertStringToBuffer( payload ) ) ),
 
-			switchMap( ( encryptedPayload: EncryptedPayload ) => this.wrapEncryptedPayload( encryptedPayload ) ),
+			switchMap( ( encryptedPayload: EncryptedPayload ) => {
 
-			switchMap( ( wrappedPayload: string ) => {
-
-				mumble.transmitPayload = new TransmitPayload( delegateToInfo.mumblerId, wrappedPayload );
+			    // TODO: Implement decision process about sub-class AppsMessage
+				mumble.transmitPayload = new TransmitPayload( delegateToInfo.mumblerId, new AppsDakMessage( topicId, encryptedPayload, null, index ) );
 
 				return of( mumble );
 
 			} )
-
 		);
 
 	}
@@ -128,34 +169,34 @@ export class MumbleService {
 
 	}
 
-	// noinspection JSMethodCanBeStatic
-	private unwrapEncryptedPayload( payload: string ): Observable< EncryptedPayload > {
-
-        type RawPayloadContainer = { iv: string, data: string, key: string };
-
-        const raw: RawPayloadContainer = JSON.parse( payload ) as RawPayloadContainer;
-
-        return of( new EncryptedPayload(
-        	StaticConversion.ConvertBase64ToBuffer( raw.data ),
-        	StaticConversion.ConvertBase64ToBuffer( raw.iv ),
-        	StaticConversion.ConvertBase64ToBuffer( raw.key )
-        ) );
-
-	}
-
-	// noinspection JSMethodCanBeStatic
-	private wrapEncryptedPayload( encryptedPayload: EncryptedPayload ): Observable< string > {
-
-	    const iv: string = StaticConversion.ConvertBufferToBase64( encryptedPayload.iv );
-	    const data: string = StaticConversion.ConvertBufferToBase64( encryptedPayload.data );
-	    const key: string = StaticConversion.ConvertBufferToBase64( encryptedPayload.key );
-
-	    return of( JSON.stringify(
-
-			{ iv, data, key }
-
-		) );
-
-	}
+	// // noinspection JSMethodCanBeStatic
+	// private unwrapEncryptedPayload( payload: string ): Observable< EncryptedPayload > {
+	//
+	//     type RawPayloadContainer = { iv: string, data: string, key: string };
+	//
+	//     const raw: RawPayloadContainer = JSON.parse( payload ) as RawPayloadContainer;
+	//
+	//     return of( new EncryptedPayload(
+	//     	StaticConversion.ConvertBase64ToBuffer( raw.data ),
+	//     	StaticConversion.ConvertBase64ToBuffer( raw.iv ),
+	//     	StaticConversion.ConvertBase64ToBuffer( raw.key )
+	//     ) );
+	//
+	// }
+	//
+	// // noinspection JSMethodCanBeStatic
+	// private wrapEncryptedPayload( encryptedPayload: EncryptedPayload ): Observable< string > {
+	//
+	//     const iv: string = StaticConversion.ConvertBufferToBase64( encryptedPayload.iv );
+	//     const data: string = StaticConversion.ConvertBufferToBase64( encryptedPayload.data );
+	//     const key: string = StaticConversion.ConvertBufferToBase64( encryptedPayload.key );
+	//
+	//     return of( JSON.stringify(
+	//
+	// 		{ iv, data, key }
+	//
+	// 	) );
+	//
+	// }
 
 }
