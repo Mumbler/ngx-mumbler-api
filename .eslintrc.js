@@ -173,7 +173,7 @@ module.exports = {
         '@typescript-eslint/func-call-spacing': ['error', 'never'],
         // note you must disable the base rule as it can report incorrect errors
         indent: 'off',
-        '@typescript-eslint/indent': ['error', 'tab'],
+        '@typescript-eslint/indent': ['error', 4],
         // note you must disable the base rule as it can report incorrect errors
         'init-declarations': 'off',
         '@typescript-eslint/init-declarations': ['error', 'always'],
