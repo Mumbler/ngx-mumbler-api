@@ -3,6 +3,8 @@
 ************* All rights reserved **************
 ************************************************/
 
+export * from './apps/apps-message.abstract';
+export * from './apps/dienst-am-kunden/apps-dak-message.class';
 export * from './lib/services/crypto/static-conversion.class';
 export * from './lib/common/parameter.class';
 export * from './lib/services/common/logger.enum';

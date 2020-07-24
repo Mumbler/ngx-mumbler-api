@@ -23,6 +23,6 @@
     ],
     "include"               : [
         "src/public-api.ts",
-        "src/lib/**/*.ts"
+        "src/**/*.ts"
     ]
 }
