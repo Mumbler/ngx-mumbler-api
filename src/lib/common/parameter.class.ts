@@ -3,171 +3,171 @@
 ************* All rights reserved **************
 ************************************************/
 import { InjectionToken } from '@angular/core';
-import { LogLevel } from '../services/common/logger.enum';
-import { MumblerId } from '../services/types/mumbler-id.type';
+import { LogLevel }       from '../services/common/logger.enum';
+import { MumblerId }      from '../services/types/mumbler-id.type';
 
 export class ExtendedMumblerParameter {
 
-	private _debugMode: boolean = false;
-	private _logLevel: LogLevel = LogLevel.OFF;
-	private _serverUrl: string = 'http://localhost:5000';
-	private _socketUrl: string = 'ws://localhost:5000';
+    private _debugMode: boolean = false;
+    private _logLevel: LogLevel = LogLevel.OFF;
+    private _serverUrl: string = 'http://localhost:5000';
+    private _socketUrl: string = 'ws://localhost:5000';
 
-	public get debugMode(): boolean {
+    public get debugMode(): boolean {
 
-		return this._debugMode;
+        return this._debugMode;
 
-	}
+    }
 
-	public set debugMode( value: boolean ) {
+    public set debugMode( value: boolean ) {
 
-		this._debugMode = value;
+        this._debugMode = value;
 
-	}
+    }
 
-	public get logLevel(): LogLevel {
+    public get logLevel(): LogLevel {
 
-		return this._logLevel;
+        return this._logLevel;
 
-	}
+    }
 
-	public set logLevel( value: LogLevel ) {
+    public set logLevel( value: LogLevel ) {
 
-		this._logLevel = value;
+        this._logLevel = value;
 
-	}
+    }
 
-	public get serverUrl(): string {
+    public get serverUrl(): string {
 
-		return this._serverUrl;
+        return this._serverUrl;
 
-	}
+    }
 
-	public set serverUrl( value: string ) {
+    public set serverUrl( value: string ) {
 
 	    if ( value.lastIndexOf( '/' ) === value.length ) {
 
-			this._serverUrl = value;
+            this._serverUrl = value;
 
-		} else {
+        } else {
 
 	        this._serverUrl = `${ value }/`;
 
-		}
+        }
 
-	}
+    }
 
-	public get socketUrl(): string {
+    public get socketUrl(): string {
 
-		return this._socketUrl;
+        return this._socketUrl;
 
-	}
+    }
 
-	public set socketUrl( value: string ) {
+    public set socketUrl( value: string ) {
 
-		if ( value.lastIndexOf( '/' ) === value.length ) {
+        if ( value.lastIndexOf( '/' ) === value.length ) {
 
-			this._socketUrl = value;
+            this._socketUrl = value;
 
-		} else {
+        } else {
 
-			this._socketUrl = `${ value }/`;
+            this._socketUrl = `${ value }/`;
 
-		}
+        }
 
-	}
+    }
 
 }
 
 export class CryptoCommunicationParameter {
 
-	private _privateKey: Uint8Array;
-	private _totpKey: Uint8Array;
+    private _privateKey: Uint8Array;
+    private _totpKey: Uint8Array;
 
-	public get privateKey(): Uint8Array {
+    public get privateKey(): Uint8Array {
 
-		return this._privateKey;
+        return this._privateKey;
 
-	}
+    }
 
-	public set privateKey( value: Uint8Array ) {
+    public set privateKey( value: Uint8Array ) {
 
-		this._privateKey = value;
+        this._privateKey = value;
 
-	}
+    }
 
-	public get totpKey(): Uint8Array {
+    public get totpKey(): Uint8Array {
 
-		return this._totpKey;
+        return this._totpKey;
 
-	}
+    }
 
-	public set totpKey( value: Uint8Array ) {
+    public set totpKey( value: Uint8Array ) {
 
-		this._totpKey = value;
+        this._totpKey = value;
 
-	}
+    }
 
 }
 
 export class MumblerParameter {
 
-	public constructor(
-		private _mumblerId: MumblerId,
-		private _mumblerName: string,
-		private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
-		private readonly _extendedCommunicationParameter: ExtendedMumblerParameter = new ExtendedMumblerParameter()
-	){}
+    public constructor(
+        private _mumblerId: MumblerId,
+        private _mumblerName: string,
+        private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
+        private readonly _extendedCommunicationParameter: ExtendedMumblerParameter = new ExtendedMumblerParameter()
+    ){}
 
-	public get mumblerId(): MumblerId {
+    public get mumblerId(): MumblerId {
 
-		return this._mumblerId;
+        return this._mumblerId;
 
-	}
+    }
 
-	public set mumblerId( value: MumblerId ) {
+    public set mumblerId( value: MumblerId ) {
 
-		this._mumblerId = value;
+        this._mumblerId = value;
 
-	}
+    }
 
-	public get mumblerName(): string {
+    public get mumblerName(): string {
 
-		return this._mumblerName;
+        return this._mumblerName;
 
-	}
+    }
 
-	public set mumblerName( value: string ) {
+    public set mumblerName( value: string ) {
 
-		this._mumblerName = value;
+        this._mumblerName = value;
 
-	}
+    }
 
-	public get crpytoCommunicationParameter(): CryptoCommunicationParameter {
+    public get crpytoCommunicationParameter(): CryptoCommunicationParameter {
 
-		return this._cryptoCommunicationParameter;
+        return this._cryptoCommunicationParameter;
 
-	}
+    }
 
-	public get extendedDelegationParameter(): ExtendedMumblerParameter {
+    public get extendedDelegationParameter(): ExtendedMumblerParameter {
 
-		return this._extendedCommunicationParameter;
+        return this._extendedCommunicationParameter;
 
-	}
+    }
 
 }
 
 export const mumblerParameterFactory: ( parameter?: MumblerParameter )=> MumblerParameter = ( parameter?: MumblerParameter ) => {
 
-	// Use provided
-	if ( !! parameter ) {
+    // Use provided
+    if ( !! parameter ) {
 
-		return parameter;
+        return parameter;
 
-	}
+    }
 
-	// Use default
-	return new MumblerParameter( null, null, null, new ExtendedMumblerParameter() );
+    // Use default
+    return new MumblerParameter( null, null, null, new ExtendedMumblerParameter() );
 
 };
 

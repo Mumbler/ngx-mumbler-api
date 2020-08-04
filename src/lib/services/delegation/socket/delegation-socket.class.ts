@@ -3,99 +3,149 @@
 ************* All rights reserved **************
 ************************************************/
 import { EMPTY, Observable, Subscriber, throwError } from 'rxjs';
-import { Mumble } from './delegation.mumble.class';
-import { MumblerIdPayload } from '../../mumble/payload/mumbler-id.payload';
-import { fromPromise } from 'rxjs/internal-compatibility';
+import { Mumble }                                    from './delegation.mumble.class';
+import { MumblerIdPayload }                          from '../../mumble/payload/mumbler-id.payload';
+import { fromPromise }                               from 'rxjs/internal-compatibility';
+import { WebSocketResponse }                         from '../../mumbler/response/web-socket.response';
+import { HeartbeatResponse }                         from '../../mumbler/response/heartbeat.response';
 
-export class DelegationSocket extends Observable< Mumble > {
+export class DelegationSocket extends Observable<Mumble> {
 
-	private _mumblerId: string;
-	private _socket: WebSocket;
+    private _heartbeatInterval: number;
+    private _mumblerId: string;
+    private _socket: WebSocket;
+    private _timeDeltaBackend: number;
 
-	public constructor( socketId: string, totp: string, socketUrl: string ) {
+    public constructor( mumblerId: string, totp: string, socketUrl: string, heartbeat: number = 5000 ) {
 
-		super( ( subscriber: Subscriber< Mumble > ) => {
+        super( ( subscriber: Subscriber<Mumble> ) => {
 
-			this._mumblerId = socketId;
-			this._socket = new WebSocket( socketUrl,  [ socketId, totp ] );
+            this._mumblerId = mumblerId;
+            this._socket = new WebSocket( socketUrl, [ mumblerId, totp ] );
 
-			this._socket.onclose = ( event: CloseEvent ) => {
+            this._socket.onclose = ( event: CloseEvent ) => {
 
-				// event.code === 1000 ("Normal closure") => no need for error throwing
-				if ( event.code !== 1000 ) {
+                // event.code === 1000 ("Normal closure") => no need for error throwing
+                if ( event.code !== 1000 ) {
 
-					subscriber.error( event );
+                    subscriber.error( event );
 
-				}
+                }
 
-				subscriber.complete();
+                // in any case stop heartbeat
+                if ( !! this._heartbeatInterval ) {
 
-			};
+                    clearInterval( this._heartbeatInterval );
+                    this._heartbeatInterval = null;
 
-			this._socket.onmessage = ( event: MessageEvent ) => {
+                }
 
-				try {
+                subscriber.complete();
 
-				    // Try to de-serialize the mumble (which comes as a blob)
-					const raw: Blob = new Blob( [ event.data ] );
+            };
 
-					fromPromise(
+            this._socket.onmessage = ( event: MessageEvent ) => {
 
-						raw.text()
+                try {
 
-					).subscribe( ( message: string ) => {
+                    // Try to de-serialize the mumble (which comes as a blob)
+                    const raw: Blob = new Blob( [ event.data ] );
 
-					    // Now we can try to parse it into a mumble object (at least the public fields)
-						subscriber.next( JSON.parse( message ) as Mumble );
+                    fromPromise(
+                        raw.text()
+                    ).subscribe( ( message: string ) => {
 
-					} );
+                        const response: WebSocketResponse|Mumble = JSON.parse( message ) as WebSocketResponse|Mumble;
 
-				} catch ( e ) {
+                        if ( !! response && 'success' in response && !! response.success && !! response.event ) {
 
-					subscriber.error( `Unable to de-serialize mumble` );
+                            if ( response.event === 'delegation' ) {
 
-				}
+                                // actually nothing to do here => success is checked above
 
-			};
+                            } else if ( response.event === 'heartbeat' ) {
 
-			this._socket.onerror = ( event: Event ) => {
+                                this._timeDeltaBackend = ( response as HeartbeatResponse ).heartbeat;
 
-				subscriber.error( event );
+                            }
 
-			};
+                        } else {
 
-		} );
+                            // Now we can try to parse it into a mumble object (at least the public fields)
+                            subscriber.next( response as Mumble );
 
-	}
+                        }
 
-	public get mumblerId(): string {
+                    } );
 
-		return this._mumblerId;
+                } catch ( e ) {
 
-	}
+                    subscriber.error( `Unable to de-serialize socket message` );
 
-	public closeChannel( code?: number, reason?: string ): void {
+                }
 
-		this._socket.close( code, reason );
+            };
 
-	}
+            this._socket.onerror = ( event: Event ) => {
 
-	public sendMessage( mumble: Mumble ): Observable< never > {
+                subscriber.error( event );
 
-		if ( !! mumble ) {
+            };
 
-			// Enforce the sender
-			mumble.mumblerId = new MumblerIdPayload( this._mumblerId );
+            this._socket.onopen = () => {
 
-			// Try to delegate ("send") the mumble
-			this._socket.send( JSON.stringify( mumble ) );
+                this._heartbeatInterval = setInterval(
+                    () => this.sendHeartbeat(),
+                    Math.max( 5000, heartbeat )
+                );
 
-			return EMPTY;
+            };
 
-		}
+        } );
 
-		return throwError( 'No payload to send found' );
+    }
 
-	}
+    public get mumblerId(): string {
+
+        return this._mumblerId;
+
+    }
+
+    public get timeDeltaBackend(): number {
+
+        return this._timeDeltaBackend;
+
+    }
+
+    public closeChannel( code?: number, reason?: string ): void {
+
+        this._socket.close( code, reason );
+
+    }
+
+    public sendMessage( mumble: Mumble ): Observable< never > {
+
+        if ( !!mumble ) {
+
+            // Enforce the sender
+            mumble.mumblerId = new MumblerIdPayload( this._mumblerId );
+
+            // Try to delegate ("send") the mumble
+            this._socket.send( JSON.stringify( { event: 'delegation', data: mumble } ) );
+
+            return EMPTY;
+
+        }
+
+        return throwError( 'No payload to send found' );
+
+    }
+
+    private sendHeartbeat(): void {
+
+        // Try to delegate ("send") the mumble
+        this._socket.send( JSON.stringify( { event: 'heartbeat', data: { heartbeat: Date.now() } } ) );
+
+    }
 
 }

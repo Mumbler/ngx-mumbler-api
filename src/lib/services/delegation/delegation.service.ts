@@ -55,7 +55,7 @@ export class DelegationService {
 
 	        switchMap( ( totp: string ) => {
 
-	            const channel: DelegationSocket = new DelegationSocket( socketId, totp, `${ this._moduleConfigService.socketUrl }delegation` );
+	            const channel: DelegationSocket = new DelegationSocket( socketId, totp, `${ this._moduleConfigService.socketUrl }` );
 
 	            this._sockets.push( channel );
 
@@ -89,18 +89,24 @@ export class DelegationService {
 
     }
 
-    public sendMumble( message: Mumble ): Observable< never > {
+    public sendMumble( mumble: Mumble ): Observable< never > {
 
-        const delegationSocket: DelegationSocket | undefined = this._sockets.find( ( findSocket: DelegationSocket ) => findSocket.mumblerId === this._mumblerConfigService.mumblerId );
+        if ( !! mumble.transmitPayload.payload ) {
 
-        if ( !! delegationSocket ) {
+            const delegationSocket: DelegationSocket | undefined = this._sockets.find( ( findSocket: DelegationSocket ) => findSocket.mumblerId === this._mumblerConfigService.mumblerId );
 
-            return delegationSocket.sendMessage( message );
+            if ( !! delegationSocket ) {
+
+                return delegationSocket.sendMessage( mumble );
+
+            }
+
+            // Fallback (no socket available): Send via HTTP-POST
+            return this._mumblerService.sendMumbleViaPost( mumble );
 
         }
 
-        // Fallback (no socket available): Send via HTTP-POST
-        return this._mumblerService.sendMumbleViaPost( message );
+        return throwError( 'Unable to init delegation, payload not encrypted' );
 
     }
 

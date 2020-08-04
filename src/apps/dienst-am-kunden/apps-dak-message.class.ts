@@ -11,19 +11,17 @@ export class AppsDakMessage extends AppsMessage {
      *
      * @param {string} _topicId                     Optional: For this use-case important
      * @param {string} content                      Mandatory: Contains the mumbled content
-     * @param {Array<Uint8Array>} files             Mandatory: Contains the mumbled file(s)
      * @param {number} _index                       Optional: For this use-case important (=> FYI: maybe possible to track single message <[ not the content/file(s)! ]>)
      * @param {number} _senderTime                  Optional: For this use-case important (=> FYI: maybe possible to track single message <[ not the content/file(s)! ]>)
      */
     public constructor(
         private readonly _topicId: string,
         content: string,
-        files: Array< Uint8Array > = null,
         private _index: number = 0,
         private _senderTime: number = Date.now()
     ) {
 
-        super( content, files );
+        super( content );
 
     }
 

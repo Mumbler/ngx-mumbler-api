@@ -170,9 +170,9 @@ export class MumblerService {
 
     }
 
-    public sendMumbleViaPost( message: Mumble ): Observable< never > {
+    public sendMumbleViaPost( mumble: Mumble ): Observable< never > {
 
-        return this.post< DelegationRequest, DelegationResponse >( 'delegation', new DelegationRequest( message ) ).pipe(
+        return this.post< DelegationRequest, DelegationResponse >( 'delegation', new DelegationRequest( mumble ) ).pipe(
 
             // TODO: Implement!
             tap( ( res: DelegationResponse ) => console.log( res ) ),

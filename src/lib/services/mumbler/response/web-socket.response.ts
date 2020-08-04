@@ -3,10 +3,11 @@
 ************* All rights reserved **************
 ************************************************/
 import { BaseResponse } from './base.response';
-import { MumblerId }    from '../../types/mumbler-id.type';
 
-export class CommenceBondingResponse extends BaseResponse {
+export type WebSocketResponseEventType = 'delegation' | 'heartbeat' | 'unknown';
 
-    public mumblerId: MumblerId;
+export class WebSocketResponse extends BaseResponse {
+
+    public event: WebSocketResponseEventType;
 
 }

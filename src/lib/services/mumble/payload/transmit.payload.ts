@@ -2,20 +2,22 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { MumblerId }   from '../../types/mumbler-id.type';
-import { AppsMessage } from '../../../../apps/apps-message.abstract';
+import { MumblerId }                  from '../../types/mumbler-id.type';
+import { SerializedEncryptedPayload } from '../../crypto/crypto.service';
 
 export class TransmitPayload {
 
     public delegateTo: MumblerId;
     public delegated: number;
-    public payload: AppsMessage;
+    public files: Array< SerializedEncryptedPayload >;
+    public payload: SerializedEncryptedPayload;
 
-    public constructor( delegateTo: MumblerId, payload?: AppsMessage, delegated: number = -1 ) {
+    public constructor( delegateTo: MumblerId, payload: SerializedEncryptedPayload = null, files: Array< SerializedEncryptedPayload > = null, delegated: number = -1 ) {
 
         this.delegateTo = delegateTo;
-        this.payload = payload;
         this.delegated = delegated;
+        this.files = files;
+        this.payload = payload;
 
     }
 

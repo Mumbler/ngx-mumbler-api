@@ -2,17 +2,18 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { BaseRequest } from './base.request';
-import { MumblerId }   from '../../types/mumbler-id.type';
-import { Mumble }      from '../../delegation/socket/delegation.mumble.class';
-import { AppsMessage } from '../../../../apps/apps-message.abstract';
+import { BaseRequest }                from './base.request';
+import { MumblerId }                  from '../../types/mumbler-id.type';
+import { Mumble }                     from '../../delegation/socket/delegation.mumble.class';
+import { SerializedEncryptedPayload } from '../../crypto/crypto.service';
 
 export class DelegationRequest extends BaseRequest {
 
     public delegateTo: MumblerId;
     public delegated: number;
+    public files: Array< SerializedEncryptedPayload >;
     public mumblerId: MumblerId;
-    public payload: AppsMessage;
+    public payload: SerializedEncryptedPayload;
 
     public constructor( mumble: Mumble ) {
 
@@ -22,6 +23,7 @@ export class DelegationRequest extends BaseRequest {
         this.delegateTo = mumble.transmitPayload.delegateTo;
         this.delegated = Date.now();
         this.payload = mumble.transmitPayload.payload;
+        this.files = mumble.transmitPayload.files;
 
     }
 

@@ -2,6 +2,4 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { BaseResponse } from './base.response';
-
-export class DelegationResponse extends BaseResponse {}
+export type MumblePayload = { key: Uint8Array, iv: Uint8Array, data: Uint8Array };

@@ -6,16 +6,16 @@ import { MumblerId } from '../../types/mumbler-id.type';
 
 export class DelegateToInfo {
 
-	public mumblerId: MumblerId;
-	public name: string;
-	public public: ArrayBuffer;
+    public mumblerId: MumblerId;
+    public name: string;
+    public public: ArrayBuffer;
 
-	public constructor( mumblerId: string, name: string, publicKey: ArrayBuffer ) {
+    public constructor( mumblerId: string, name: string, publicKey: ArrayBuffer ) {
 
 	    this.mumblerId = mumblerId;
-		this.name = name;
-		this.public = publicKey;
+        this.name = name;
+        this.public = publicKey;
 
-	}
+    }
 
 }
