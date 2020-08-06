@@ -8,6 +8,7 @@ import { MumblerIdPayload }                          from '../../mumble/payload/
 import { fromPromise }                               from 'rxjs/internal-compatibility';
 import { WebSocketResponse }                         from '../../mumbler/response/web-socket.response';
 import { HeartbeatResponse }                         from '../../mumbler/response/heartbeat.response';
+import { DelegationRequest }                         from '../../mumbler/requests/delegation.request';
 
 export class DelegationSocket extends Observable<Mumble> {
 
@@ -130,8 +131,15 @@ export class DelegationSocket extends Observable<Mumble> {
             // Enforce the sender
             mumble.mumblerId = new MumblerIdPayload( this._mumblerId );
 
-            // Try to delegate ("send") the mumble
-            this._socket.send( JSON.stringify( { event: 'delegation', data: mumble } ) );
+            try { // Try to delegate ("send") the mumble
+
+                this._socket.send( JSON.stringify( { event: 'delegation', data: new DelegationRequest( mumble ) } ) );
+
+            } catch ( e ) {
+
+                console.warn( e );
+
+            }
 
             return EMPTY;
 
