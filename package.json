@@ -1,0 +1,33 @@
+{
+    "name": "ngx-mumbler-api",
+    "version": "0.1.0",
+    "description": "Angular 10 client module for on-boarding, bonding, sending and receiving of mumbles",
+    "main": "src/lib/ngx-mumbler-api.module.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "DI Xaver M. Kienzerle - mumbler gmbh",
+    "license": "ISC",
+    "peerDependencies": {
+        "@angular/common": "^10.0.4",
+        "@angular/core": "^10.0.4"
+    },
+    "devDependencies": {
+        "@angular/core": "^10.0.0",
+        "@typescript-eslint/eslint-plugin": "^2.34.0",
+        "@typescript-eslint/parser": "^2.34.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.10.0",
+        "eslint-plugin-header": "^3.0.0",
+        "eslint-plugin-import": "^2.20.1",
+        "prettier": "^1.19.1",
+        "ts-loader": "^6.2.1",
+        "ts-node": "^8.6.2",
+        "tsconfig-paths": "^3.9.0",
+        "typescript": "^3.9.3",
+        "uuid": "^8.1.0"
+    },
+    "dependencies": {
+        "tslib": "^2.0.0"
+    }
+}
