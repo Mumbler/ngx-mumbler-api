@@ -1,7 +1,7 @@
 {
     "name": "ngx-mumbler-api",
-    "version": "1.0.0",
-    "description": "An Angular client module which allows to open, maintaine and communicate with various mumbler(s)",
+    "version": "0.1.0",
+    "description": "Angular 10 client module for on-boarding, bonding, sending and receiving of mumbles",
     "main": "src/lib/ngx-mumbler-api.module.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
