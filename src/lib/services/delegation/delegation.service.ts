@@ -97,7 +97,11 @@ export class DelegationService {
 
             if ( !! delegationSocket ) {
 
-                return delegationSocket.sendMessage( mumble );
+                return this._cryptoService.computeTotp().pipe(
+
+                    switchMap( ( authorization: string ) => delegationSocket.sendMessage( authorization, mumble ) )
+
+                );
 
             }
 

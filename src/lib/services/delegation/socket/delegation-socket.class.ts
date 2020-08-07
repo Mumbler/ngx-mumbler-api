@@ -124,7 +124,7 @@ export class DelegationSocket extends Observable<Mumble> {
 
     }
 
-    public sendMessage( mumble: Mumble ): Observable< never > {
+    public sendMessage( authorization: string, mumble: Mumble ): Observable< never > {
 
         if ( !!mumble ) {
 
@@ -133,7 +133,7 @@ export class DelegationSocket extends Observable<Mumble> {
 
             try { // Try to delegate ("send") the mumble
 
-                this._socket.send( JSON.stringify( { event: 'delegation', data: new DelegationRequest( mumble ) } ) );
+                this._socket.send( JSON.stringify( { event: 'delegation', data: new DelegationRequest( mumble, authorization ) } ) );
 
             } catch ( e ) {
 
