@@ -1,5 +1,5 @@
 {
-    "name": "ngx-mumbler-api",
+    "name": "@mumbler/ngx-mumbler-api",
     "version": "0.1.0",
     "description": "Angular 10 client module for on-boarding, bonding, sending and receiving of mumbles",
     "main": "src/lib/ngx-mumbler-api.module.ts",
@@ -7,7 +7,23 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "DI Xaver M. Kienzerle - mumbler gmbh",
-    "license": "ISC",
+    "license": "LGPL-3.0",
+    "private": false,
+    "keywords": [
+        "mumbler",
+        "mumbler-api",
+        "ngx-mumbler-api",
+        "initiative",
+        "briefgeheimnis",
+        "privacy",
+        "correspondence",
+        "crypto",
+        "subtle",
+        "webcrypto",
+        "angular"
+    ],
+    "homepage": "https://www.mumbler.eu",
+    "repository": "https://github.com/Mumbler/ngx-mumbler-api",
     "peerDependencies": {
         "@angular/common": "^10.0.4",
         "@angular/core": "^10.0.4"
