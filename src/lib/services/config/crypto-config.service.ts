@@ -3,115 +3,115 @@
 ************* All rights reserved **************
 ************************************************/
 
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable }                               from '@angular/core';
 import { MumblerParameter, mumblerParameterInjectionToken } from '../../common/parameter.class';
 
 @Injectable( {
-	providedIn: 'root'
+    providedIn: 'root'
 } )
 export class CryptoConfigService {
 
-	// Asynchronous encryption specific
-	private _asynchronousAlgorithm: string = 'RSA-OAEP';
-	private _asynchronousLength: number = 4096;
-	private _asynchronousPublicExponent: Uint8Array = new Uint8Array( [ 1, 0, 1 ] );
+    // Asynchronous encryption specific
+    private _asynchronousAlgorithm: string = 'RSA-OAEP';
+    private _asynchronousLength: number = 4096;
+    private _asynchronousPublicExponent: Uint8Array = new Uint8Array( [ 1, 0, 1 ] );
 
 
-	// Derive specific
-	private _deriveAlgorithm: string = 'PBKDF2';
-	private _deriveIterations: number = 4294967296;    // 2 ^ 32
+    // Derive specific
+    private _deriveAlgorithm: string = 'PBKDF2';
+    private _deriveIterations: number = 4294967296;    // 2 ^ 32
 
-	// Hash
-	private _hashAlgorithm: string = 'SHA-512';
+    // Hash
+    private _hashAlgorithm: string = 'SHA-512';
 
-	// Synchronous encryption specific
-	private _synchronousAlgorithm: string = 'AES-CBC';
-	private _synchronousLength: number = 256;
+    // Synchronous encryption specific
+    private _synchronousAlgorithm: string = 'AES-CBC';
+    private _synchronousLength: number = 256;
 
-	// TOTP HMAC Algorithm name
-	private _totpAlgorithm: string = 'HMAC';
+    // TOTP HMAC Algorithm name
+    private _totpAlgorithm: string = 'HMAC';
 
-	public constructor(
-		@Inject( mumblerParameterInjectionToken ) private readonly _communicationParameter: MumblerParameter
-	) {}
+    public constructor(
+        @Inject( mumblerParameterInjectionToken ) private readonly _communicationParameter: MumblerParameter
+    ) {}
 
-	public get asynchronousAlgorithm(): string {
+    public get asynchronousAlgorithm(): string {
 
-		return this._asynchronousAlgorithm;
+        return this._asynchronousAlgorithm;
 
-	}
+    }
 
-	public get asynchronousLength(): number {
+    public get asynchronousLength(): number {
 
-		return this._asynchronousLength;
+        return this._asynchronousLength;
 
-	}
+    }
 
-	public get asynchronousPublicExponent(): Uint8Array {
+    public get asynchronousPublicExponent(): Uint8Array {
 
-		return this._asynchronousPublicExponent;
+        return this._asynchronousPublicExponent;
 
-	}
+    }
 
-	public get deriveAlgorithm(): string {
+    public get deriveAlgorithm(): string {
 
-		return this._deriveAlgorithm;
+        return this._deriveAlgorithm;
 
-	}
+    }
 
-	public get deriveIterations(): number {
+    public get deriveIterations(): number {
 
-		return this._deriveIterations;
+        return this._deriveIterations;
 
-	}
+    }
 
-	public get hashAlgorithm(): string {
+    public get hashAlgorithm(): string {
 
-		return this._hashAlgorithm;
+        return this._hashAlgorithm;
 
-	}
+    }
 
-	public get privateKey(): Uint8Array {
+    public get privateKey(): Uint8Array {
 
-		return this._communicationParameter.crpytoCommunicationParameter.privateKey;
+        return this._communicationParameter.cryptoCommunicationParameter.privateKey;
 
-	}
+    }
 
-	public set privateKey( value: Uint8Array ) {
+    public set privateKey( value: Uint8Array ) {
 
-		this._communicationParameter.crpytoCommunicationParameter.privateKey = value;
+        this._communicationParameter.cryptoCommunicationParameter.privateKey = value;
 
-	}
+    }
 
-	public get synchronousAlgorithm(): string {
+    public get synchronousAlgorithm(): string {
 
-		return this._synchronousAlgorithm;
+        return this._synchronousAlgorithm;
 
-	}
+    }
 
-	public get synchronousLength(): number {
+    public get synchronousLength(): number {
 
-		return this._synchronousLength;
+        return this._synchronousLength;
 
-	}
+    }
 
 
-	public get totpKey(): Uint8Array {
+    public get totpKey(): Uint8Array {
 
-		return this._communicationParameter.crpytoCommunicationParameter.totpKey;
+        return this._communicationParameter.cryptoCommunicationParameter.totpKey;
 
-	}
+    }
 
-	public set totpKey( value: Uint8Array ) {
+    public set totpKey( value: Uint8Array ) {
 
-		this._communicationParameter.crpytoCommunicationParameter.totpKey = value;
+        this._communicationParameter.cryptoCommunicationParameter.totpKey = value;
 
-	}
+    }
 
-	public get totpAlgorithm(): string {
+    public get totpAlgorithm(): string {
 
-		return this._totpAlgorithm;
+        return this._totpAlgorithm;
 
-	}
+    }
 
 }

@@ -113,8 +113,8 @@ export class CryptoCommunicationParameter {
 export class MumblerParameter {
 
     public constructor(
-        private _mumblerId: MumblerId,
-        private _mumblerName: string,
+        private _mumblerId: MumblerId = null,
+        private _mumblerName: string = null,
         private readonly _cryptoCommunicationParameter: CryptoCommunicationParameter = new CryptoCommunicationParameter(),
         private readonly _extendedCommunicationParameter: ExtendedMumblerParameter = new ExtendedMumblerParameter()
     ){}
@@ -143,7 +143,7 @@ export class MumblerParameter {
 
     }
 
-    public get crpytoCommunicationParameter(): CryptoCommunicationParameter {
+    public get cryptoCommunicationParameter(): CryptoCommunicationParameter {
 
         return this._cryptoCommunicationParameter;
 

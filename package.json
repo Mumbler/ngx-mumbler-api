@@ -1,9 +1,11 @@
 {
     "name": "@mumbler/ngx-mumbler-api",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Angular 10 client module for on-boarding, bonding, sending and receiving of mumbles",
-    "main": "src/lib/ngx-mumbler-api.module.ts",
+    "main": "../../dist/ngx-mumbler-api/ngx-mumbler-api.module.ts",
     "scripts": {
+        "prepublish": "npm run-script build-prod",
+        "build-prod": "ng build --prod",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "DI Xaver M. Kienzerle - mumbler gmbh",
@@ -45,5 +47,8 @@
     },
     "dependencies": {
         "tslib": "^2.0.0"
-    }
+    },
+    "files": [
+        "../../dist/ngx-mumbler-api/"
+    ]
 }
