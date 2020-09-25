@@ -2,32 +2,32 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
+import { HttpClient, HttpEvent, HttpEventType, HttpHeaders }              from '@angular/common/http';
 import { Injectable }                                                     from '@angular/core';
-import { CryptoKeyPairString, CryptoService, SerializedEncryptedPayload } from '../crypto/crypto.service';
-import { CryptoConfigService }                                            from '../config/crypto-config.service';
-import { LoggerService }                                                  from '../common/logger.service';
 import { EMPTY, forkJoin, Observable, of, Subscriber }                    from 'rxjs';
 import { switchMap, tap }                                                 from 'rxjs/operators';
-import { StaticConversion }                                               from '../crypto/static-conversion.class';
-import { OnboardingRequest }                                              from './requests/onboarding.request';
-import { OnboardingResponse }                                             from './response/onboarding.response';
-import { HttpClient, HttpEvent, HttpEventType, HttpHeaders }              from '@angular/common/http';
+import { LoggerService }                                                  from '../common/logger.service';
+import { CryptoConfigService }                                            from '../config/crypto-config.service';
 import { DelegationConfigService }                                        from '../config/delegation-config.service';
-import { BaseResponse }                                                   from './response/base.response';
-import { BaseRequest }                                                    from './requests/base.request';
-import { MumblerConfigService }                                           from '../config/mumbler-config.service';
-import { InitBondingResponse }                                            from './response/init-bonding.response';
-import { BondingParameterModel }                                          from './model/bonding-parameter.model';
-import { TotpClass }                                                      from '../crypto/totp.class';
-import { CommenceBondingRequest }                                         from './requests/commence-bonding.request';
-import { CommenceBondingResponse }                                        from './response/commence-bonding.response';
-import { MumblerId }                                                      from '../types/mumbler-id.type';
-import { DelegateToInfoResponse }                                         from './response/delegate-to-info.response';
-import { DelegateToInfo }                                                 from '../delegation/delegation/delegate-to-info.class';
 import { ModuleConfigService }                                            from '../config/module-config.service';
+import { MumblerConfigService }                                           from '../config/mumbler-config.service';
+import { CryptoKeyPairString, CryptoService, SerializedEncryptedPayload } from '../crypto/crypto.service';
+import { StaticConversion }                                               from '../crypto/static-conversion.class';
+import { TotpClass }                                                      from '../crypto/totp.class';
+import { DelegateToInfo }                                                 from '../delegation/delegation/delegate-to-info.class';
 import { Mumble }                                                         from '../delegation/socket/delegation.mumble.class';
+import { MumblerId }                                                      from '../types/mumbler-id.type';
+import { BondingParameterModel }                                          from './model/bonding-parameter.model';
+import { BaseRequest }                                                    from './requests/base.request';
+import { CommenceBondingRequest }                                         from './requests/commence-bonding.request';
 import { DelegationRequest }                                              from './requests/delegation.request';
+import { OnboardingRequest }                                              from './requests/onboarding.request';
+import { BaseResponse }                                                   from './response/base.response';
+import { CommenceBondingResponse }                                        from './response/commence-bonding.response';
+import { DelegateToInfoResponse }                                         from './response/delegate-to-info.response';
 import { DelegationResponse }                                             from './response/delegation.response';
+import { InitBondingResponse }                                            from './response/init-bonding.response';
+import { OnboardingResponse }                                             from './response/onboarding.response';
 
 @Injectable( {
     providedIn: 'root'
@@ -86,19 +86,17 @@ export class MumblerService {
             switchMap( ( response: DelegateToInfoResponse ) => forkJoin( [
 
                 this._cryptoService.decryptBuffer( SerializedEncryptedPayload.ConvertToEncryptedPayload( response.name ) ),
-                of( StaticConversion.ConvertBase64ToBuffer( response.public ) )
-                // TODO: Re-enable server-side encryption when figured out what goes wrong
-                // this._cryptoService.decryptBuffer( SerializedEncryptedPayload.ConvertToEncryptedPayload( response.public ) )
+                this._cryptoService.decryptBuffer( SerializedEncryptedPayload.ConvertToEncryptedPayload( response.public ) )
 
             ] ) ),
 
             tap( () => this._loggerService.debug( `Decrypted delegation info`, 'MumblerService' ) ),
 
-            switchMap( ( decrypted: [ Uint8Array, Uint8Array ] ) => of(
-
-			    new DelegateToInfo( delegateTo, StaticConversion.ConvertBufferToString( decrypted[ 0 ] ), decrypted[ 1 ] )
-
-            ) )
+            switchMap( ( decrypted: [ Uint8Array, Uint8Array ] ) => of( new DelegateToInfo(
+                delegateTo,
+                StaticConversion.ConvertBufferToString( decrypted[ 0 ] ),
+                decrypted[ 1 ]
+            ) ) )
 
         );
 
