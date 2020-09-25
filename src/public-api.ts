@@ -13,4 +13,5 @@ export * from './lib/services/delegation/socket/delegation.mumble.class';
 export * from './lib/services/delegation/delegation/delegate-to-info.class';
 export * from './lib/services/mumbler/model/bonding-parameter.model';
 export * from './lib/services/mumbler/mumbler.service';
+export * from './lib/services/types/mumbler-id.type';
 export * from './lib/ngx-mumbler-api.module';
