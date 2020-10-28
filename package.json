@@ -1,6 +1,6 @@
 {
     "name": "@mumbler/ngx-mumbler-api",
-    "version": "0.2.3",
+    "version": "0.2.5",
     "description": "Angular 10 client module for on-boarding, bonding, sending and receiving of mumbles",
     "main": "../../dist/ngx-mumbler-api/ngx-mumbler-api.module.ts",
     "scripts": {
