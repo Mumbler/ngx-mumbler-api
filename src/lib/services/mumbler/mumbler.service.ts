@@ -4,7 +4,7 @@
 ************************************************/
 import { HttpClient, HttpEvent, HttpEventType, HttpHeaders }              from '@angular/common/http';
 import { Injectable }                                                     from '@angular/core';
-import { EMPTY, forkJoin, Observable, of, Subscriber }                    from 'rxjs';
+import { EMPTY, forkJoin, Observable, of, Subscriber, throwError }        from 'rxjs';
 import { switchMap, tap }                                                 from 'rxjs/operators';
 import { LoggerService }                                                  from '../common/logger.service';
 import { CryptoConfigService }                                            from '../config/crypto-config.service';
@@ -125,7 +125,16 @@ export class MumblerService {
 
     }
 
-    public onboarding( mumbleName: string ): Observable< never > {
+    public onboarding( mumbleName: string, mumblerId: string = undefined ): Observable< never > {
+
+        if (
+            !! this._mumblerConfigService.mumblerId && this._mumblerConfigService.mumblerId.length > 0 &&
+            !! this._cryptoConfigService.totpKey && this._cryptoConfigService.totpKey.byteLength > 0
+        ) {
+
+            return throwError( 'Already on-boarded' );
+
+        }
 
         this._loggerService.debug( `Started on-boarding process`, 'MumblerService' );
 
@@ -144,7 +153,8 @@ export class MumblerService {
 
                 return this.post< OnboardingRequest, OnboardingResponse >( 'on-boarding/register/client', new OnboardingRequest(
                     mumbleName,
-                    keyPair.publicKey
+                    keyPair.publicKey,
+                    mumblerId
                 ) );
 
             } ),
