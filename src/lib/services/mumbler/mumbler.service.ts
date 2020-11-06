@@ -5,7 +5,7 @@
 import { HttpClient, HttpEvent, HttpEventType, HttpHeaders }              from '@angular/common/http';
 import { Injectable }                                                     from '@angular/core';
 import { EMPTY, forkJoin, Observable, of, Subscriber, throwError }        from 'rxjs';
-import { switchMap, tap }                                                 from 'rxjs/operators';
+import { map, switchMap, tap }                                            from 'rxjs/operators';
 import { LoggerService }                                                  from '../common/logger.service';
 import { CryptoConfigService }                                            from '../config/crypto-config.service';
 import { DelegationConfigService }                                        from '../config/delegation-config.service';
@@ -22,6 +22,7 @@ import { BaseRequest }                                                    from '
 import { CommenceBondingRequest }                                         from './requests/commence-bonding.request';
 import { DelegationRequest }                                              from './requests/delegation.request';
 import { OnboardingRequest }                                              from './requests/onboarding.request';
+import { AssociatedMumblersResponse }                                     from './response/associated-mumblers.response';
 import { BaseResponse }                                                   from './response/base.response';
 import { CommenceBondingResponse }                                        from './response/commence-bonding.response';
 import { DelegateToInfoResponse }                                         from './response/delegate-to-info.response';
@@ -43,6 +44,32 @@ export class MumblerService {
         private readonly _loggerService: LoggerService,
         private readonly _httpClient: HttpClient
     ) {}
+
+    public associatedMumblerIds(): Observable< Array< MumblerId > > {
+
+        this._loggerService.debug( `Querying associated mumblers for "${ this._mumblerConfigService.mumblerId }"`, 'MumblerService' );
+
+        return this.get< AssociatedMumblersResponse >( `mumbler/${ this._mumblerConfigService.mumblerId }/associatedMumblers` ).pipe(
+
+            tap( () => this._loggerService.debug( `Successfully queried associated info`, 'MumblerService' ) ),
+
+            map( ( response: AssociatedMumblersResponse ) => {
+
+                if ( !! response.success ) {
+
+                    return response.group;
+
+                }
+
+                return [];
+
+            } ),
+
+            tap( () => this._loggerService.debug( `Decrypted delegation info`, 'MumblerService' ) )
+
+        );
+
+    }
 
     public commenceBonding( bondingToken: string, totpKey: Uint8Array ): Observable< MumblerId > {
 
