@@ -2,16 +2,17 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { Injectable }                    from '@angular/core';
-import { ModuleConfigService }           from '../config/module-config.service';
-import { MumblerConfigService }          from '../config/mumbler-config.service';
-import { EMPTY, Observable, throwError } from 'rxjs';
-import { CryptoService }                 from '../crypto/crypto.service';
-import { catchError, switchMap, tap }    from 'rxjs/operators';
-import { LoggerService }                 from '../common/logger.service';
-import { DelegationSocket }              from './socket/delegation-socket.class';
-import { Mumble }                        from './socket/delegation.mumble.class';
-import { MumblerService }                from '../mumbler/mumbler.service';
+import { Injectable, isDevMode }      from '@angular/core';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import { LoggerService }              from '../common/logger.service';
+import { WindowService }              from '../common/window.service';
+import { ModuleConfigService }        from '../config/module-config.service';
+import { MumblerConfigService }       from '../config/mumbler-config.service';
+import { CryptoService }              from '../crypto/crypto.service';
+import { MumblerService }             from '../mumbler/mumbler.service';
+import { DelegationSocket }           from './socket/delegation-socket.class';
+import { Mumble }                     from './socket/delegation.mumble.class';
 
 @Injectable( {
     providedIn: 'root'
@@ -25,41 +26,76 @@ export class DelegationService {
         private readonly _loggerService: LoggerService,
 	    private readonly _moduleConfigService: ModuleConfigService,
         private readonly _mumblerConfigService: MumblerConfigService,
-        private readonly _mumblerService: MumblerService
-    ) {}
+        private readonly _mumblerService: MumblerService,
+        private readonly _windowService: WindowService
+    ) {
 
-    public closeSocket( socketId: string = this._mumblerConfigService.mumblerId ): Observable< never > {
+        // this._windowService.nativeWindow.addEventListener( 'online', ( /*event: Event*/ ) => {
+        //
+        //
+        //
+        // } );
+
+        this._windowService.nativeWindow.addEventListener( 'offline', ( /*event: Event*/ ) => {
+
+            this._sockets.forEach( ( socket: DelegationSocket ) => this.closeSocket( socket.mumblerId ) );
+
+            // All sockets should be closed (and therefore removed from the list)
+            if ( this._sockets.length > 0 ) {
+
+                this._loggerService.warn( 'Offline event received, not all sockets could be closed safely.', 'DelegationService' );
+
+            }
+
+        } );
+
+    }
+
+    public closeSocket( socketId: string = this._mumblerConfigService.mumblerId ): Observable< boolean > {
 
 	    const socket: DelegationSocket | undefined = this._sockets.find( ( findSocket: DelegationSocket ) => findSocket.mumblerId === socketId );
 
+	    if ( isDevMode() ) {
+
+	        this._loggerService.debug( `Closing socket for "${ !! socket ? socket.mumblerId : '<none>' }"` );
+
+        }
+
         if ( !! socket ) {
 
-		    // Close the socket
-            socket.closeChannel( 1000, 'Closed by client' );
+            if ( socket.state !== WebSocket.CLOSED ) {
+
+                // Close the socket
+                socket.closeChannel( 1000, 'Closed by client' );
+
+            }
 
             // Remove the socket
             this._sockets.splice( this._sockets.indexOf( socket ), 1 );
 
             // Signal all good (nothing abnormal)
-            return EMPTY;
+            return of( true );
 
         }
 
-        return throwError( 'Unable to close unknown socket' );
+        return of( false );
 
     }
 
     public openSocket( socketId: string = this._mumblerConfigService.mumblerId ): Observable< Mumble > {
 
-	    return this._cryptoService.computeTotp().pipe(
+        // First try to close the socket... maybe still open (at least perform some internal cleanup)
+        return this.closeSocket( socketId ).pipe(
 
-	        switchMap( ( totp: string ) => {
+            switchMap( () => this._cryptoService.computeTotp() ),
 
-	            const channel: DelegationSocket = new DelegationSocket( socketId, totp, `${ this._moduleConfigService.socketUrl }` );
+            switchMap( ( totp: string ) => {
 
-	            this._sockets.push( channel );
+                const channel: DelegationSocket = new DelegationSocket( socketId, totp, `${ this._moduleConfigService.socketUrl }` );
 
-	            return channel;
+                this._sockets.push( channel );
+
+                return channel;
 
             } ),
 
@@ -67,13 +103,13 @@ export class DelegationService {
 
             catchError( ( err: unknown ) => {
 
-			    if ( err instanceof CloseEvent ) {
+                if ( err instanceof CloseEvent ) {
 
                     this._loggerService.warn( `Received close reason "${ err.reason } (${ err.code })" from socket`, 'DelegationService' );
 
                 } else {
 
-			        console.log( err );
+                    console.log( err );
 
                     // TODO: Handle type "err" correctly
                     // eslint-disable-next-line @typescript-eslint/no-base-to-string,@typescript-eslint/restrict-template-expressions

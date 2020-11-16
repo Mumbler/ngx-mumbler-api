@@ -5,16 +5,16 @@
 import { Injectable }                                                  from '@angular/core';
 import { forkJoin, Observable, of, throwError }                        from 'rxjs';
 import { switchMap, tap }                                              from 'rxjs/operators';
-import { DelegationService }                                           from '../delegation/delegation.service';
+import { AppsMessage }                                                 from '../../../apps/apps-message.abstract';
 import { LoggerService }                                               from '../common/logger.service';
+import { MumblerConfigService }                                        from '../config/mumbler-config.service';
 import { CryptoService, EncryptedPayload, SerializedEncryptedPayload } from '../crypto/crypto.service';
 import { StaticConversion }                                            from '../crypto/static-conversion.class';
+import { DelegationService }                                           from '../delegation/delegation.service';
+import { DelegateToInfo }                                              from '../delegation/delegation/delegate-to-info.class';
 import { Mumble }                                                      from '../delegation/socket/delegation.mumble.class';
-import { MumblerConfigService }                                        from '../config/mumbler-config.service';
 import { MumblerService }                                              from '../mumbler/mumbler.service';
 import { MumblerId }                                                   from '../types/mumbler-id.type';
-import { DelegateToInfo }                                              from '../delegation/delegation/delegate-to-info.class';
-import { AppsMessage }                                                 from '../../../apps/apps-message.abstract';
 
 @Injectable( {
     providedIn: 'root'
@@ -182,7 +182,7 @@ export class MumbleService {
     //
     // }
 
-    public stop(): Observable< never > {
+    public stop(): Observable< boolean > {
 
 	    return this._delegationService.closeSocket();
 

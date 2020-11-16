@@ -3,14 +3,14 @@
 ************* All rights reserved **************
 ************************************************/
 import { EMPTY, Observable, Subscriber, throwError } from 'rxjs';
-import { Mumble }                                    from './delegation.mumble.class';
-import { MumblerIdPayload }                          from '../../mumble/payload/mumbler-id.payload';
 import { fromPromise }                               from 'rxjs/internal-compatibility';
-import { WebSocketResponse }                         from '../../mumbler/response/web-socket.response';
-import { HeartbeatResponse }                         from '../../mumbler/response/heartbeat.response';
+import { MumblerIdPayload }                          from '../../mumble/payload/mumbler-id.payload';
 import { DelegationRequest }                         from '../../mumbler/requests/delegation.request';
+import { HeartbeatResponse }                         from '../../mumbler/response/heartbeat.response';
+import { WebSocketResponse }                         from '../../mumbler/response/web-socket.response';
+import { Mumble }                                    from './delegation.mumble.class';
 
-export class DelegationSocket extends Observable<Mumble> {
+export class DelegationSocket extends Observable< Mumble > {
 
     private _heartbeatInterval: number;
     private _mumblerId: string;
@@ -19,7 +19,7 @@ export class DelegationSocket extends Observable<Mumble> {
 
     public constructor( mumblerId: string, totp: string, socketUrl: string, heartbeat: number = 5000 ) {
 
-        super( ( subscriber: Subscriber<Mumble> ) => {
+        super( ( subscriber: Subscriber< Mumble > ) => {
 
             this._mumblerId = mumblerId;
             this._socket = new WebSocket( socketUrl, [ mumblerId, totp ] );
@@ -115,6 +115,12 @@ export class DelegationSocket extends Observable<Mumble> {
     public get timeDeltaBackend(): number {
 
         return this._timeDeltaBackend;
+
+    }
+
+    public get state(): number {
+
+        return this._socket.readyState;
 
     }
 
