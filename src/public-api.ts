@@ -3,6 +3,7 @@
 ************* All rights reserved **************
 ************************************************/
 
+export * from './lib/services/common/logger.service';
 export * from './apps/apps-message.abstract';
 export * from './lib/services/crypto/static-conversion.class';
 export * from './lib/common/parameter.class';
