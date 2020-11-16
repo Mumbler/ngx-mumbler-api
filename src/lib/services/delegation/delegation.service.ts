@@ -2,17 +2,17 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { Injectable, isDevMode }      from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
-import { LoggerService }              from '../common/logger.service';
-import { WindowService }              from '../common/window.service';
-import { ModuleConfigService }        from '../config/module-config.service';
-import { MumblerConfigService }       from '../config/mumbler-config.service';
-import { CryptoService }              from '../crypto/crypto.service';
-import { MumblerService }             from '../mumbler/mumbler.service';
-import { DelegationSocket }           from './socket/delegation-socket.class';
-import { Mumble }                     from './socket/delegation.mumble.class';
+import { Injectable, isDevMode }                       from '@angular/core';
+import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap, tap }             from 'rxjs/operators';
+import { LoggerService }                               from '../common/logger.service';
+import { WindowService }                               from '../common/window.service';
+import { ModuleConfigService }                         from '../config/module-config.service';
+import { MumblerConfigService }                        from '../config/mumbler-config.service';
+import { CryptoService }                               from '../crypto/crypto.service';
+import { MumblerService }                              from '../mumbler/mumbler.service';
+import { DelegationSocket }                            from './socket/delegation-socket.class';
+import { Mumble }                                      from './socket/delegation.mumble.class';
 
 @Injectable( {
     providedIn: 'root'
@@ -30,22 +30,26 @@ export class DelegationService {
         private readonly _windowService: WindowService
     ) {
 
-        // this._windowService.nativeWindow.addEventListener( 'online', ( /*event: Event*/ ) => {
-        //
-        //
-        //
-        // } );
-
         this._windowService.nativeWindow.addEventListener( 'offline', ( /*event: Event*/ ) => {
 
-            this._sockets.forEach( ( socket: DelegationSocket ) => this.closeSocket( socket.mumblerId ) );
+            forkJoin( this._sockets.map( ( socket: DelegationSocket ) => this.closeSocket( socket.mumblerId ) ) ).pipe(
 
-            // All sockets should be closed (and therefore removed from the list)
-            if ( this._sockets.length > 0 ) {
+                map( ( closedSockets: Array< boolean > ) => closedSockets.reduce(  ( previousValue: boolean, currentValue: boolean ) => previousValue === currentValue && !!! currentValue  ) ),
 
-                this._loggerService.warn( 'Offline event received, not all sockets could be closed safely.', 'DelegationService' );
+                tap( ( result: boolean ) => {
 
-            }
+                    // All sockets should be closed (and therefore removed from the list)
+                    if ( !!! result || this._sockets.length > 0 ) {
+
+                        this._loggerService.warn( 'Offline mode detected... Not all sockets could be closed cleanly.', 'DelegationService' );
+
+                    }
+
+                    this._loggerService.verbose( 'Offline mode detected... All sockets were closed. When online, please re-connect using "listen()"' );
+
+                } )
+
+            );
 
         } );
 
@@ -109,15 +113,14 @@ export class DelegationService {
 
                 } else {
 
-                    console.log( err );
-
                     // TODO: Handle type "err" correctly
                     // eslint-disable-next-line @typescript-eslint/no-base-to-string,@typescript-eslint/restrict-template-expressions
                     this._loggerService.warn( `Received error "${ err }" from socket`, 'DelegationService' );
 
                 }
 
-                return throwError( 'Unable to open socket' );
+                // Finalize the pipeline
+                return EMPTY;
 
             } )
 
