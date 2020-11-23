@@ -7,91 +7,110 @@ import { MumblerParameter, mumblerParameterInjectionToken } from '../../common/p
 import { LogLevel } from './logger.enum';
 
 @Injectable( {
-	providedIn: 'root'
+    providedIn: 'root'
 } )
 export class LoggerService {
 
-	private readonly _logLevel: LogLevel;
+    private readonly _logLevel: LogLevel;
 
-	public constructor(
-		@Inject( mumblerParameterInjectionToken ) private readonly _communicationParameter: MumblerParameter
-	) {
+    public constructor(
+        @Inject( mumblerParameterInjectionToken ) private readonly _communicationParameter: MumblerParameter
+    ) {
 
-	    this._logLevel = this._communicationParameter.extendedDelegationParameter.logLevel;
+        this._logLevel = this._communicationParameter.extendedDelegationParameter.logLevel;
 
-	}
+    }
 
-	public get logLevel(): LogLevel {
+    public static ConvertToString( source: unknown ): string {
 
-		return this._logLevel;
+        if ( typeof source === 'object' ) {
 
-	}
+            return JSON.stringify( source );
 
-	public debug( message: string, source?: string ): void {
+        } else if ( typeof source === 'string' || typeof  source === 'number' || typeof  source === 'bigint' || typeof source === 'boolean' ) {
 
-		this.doLog( LogLevel.DEBUG, message, source );
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
+            return `${ source }`;
 
-	}
+        } else {
 
-	public error( message: string, source?: string ): void {
+            return '<not convertable>';
 
-		this.doLog( LogLevel.ERROR, message, source );
+        }
 
-	}
+    }
 
-	public fatal( message: string, source?: string ): void {
+    public get logLevel(): LogLevel {
 
-		this.doLog( LogLevel.FATAL, message, source );
+        return this._logLevel;
 
-	}
+    }
 
-	public verbose( message: string, source?: string ): void {
+    public debug( message: string, source?: string ): void {
 
-		this.doLog( LogLevel.VERBOSE, message, source );
+        this.doLog( LogLevel.DEBUG, message, source );
 
-	}
+    }
 
-	public warn( message: string, source?: string ): void {
+    public error( message: string, source?: string ): void {
 
-		this.doLog( LogLevel.WARN, message, source );
+        this.doLog( LogLevel.ERROR, message, source );
 
-	}
+    }
 
-	private doLog( type: LogLevel = LogLevel.ALL, message: string = '', source: string = 'Unknown' ): void {
+    public fatal( message: string, source?: string ): void {
 
-		if ( type >= this._logLevel && type === LogLevel.ALL ) {
+        this.doLog( LogLevel.FATAL, message, source );
 
-			this.printLine( `[${ source }] ${ message }`, 'color: #000000' );
+    }
 
-		} else if ( type >= this._logLevel && type === LogLevel.DEBUG ) {
+    public verbose( message: string, source?: string ): void {
 
-			this.printLine( `[${ source }] ${ message }`, 'color: #00CC00' );
+        this.doLog( LogLevel.VERBOSE, message, source );
 
-		} else if ( type >= this._logLevel && type === LogLevel.VERBOSE ) {
+    }
 
-			this.printLine( `[${ source }] ${ message }`, 'color: #0080FF' );
+    public warn( message: string, source?: string ): void {
 
-		} else if ( type >= this._logLevel && type === LogLevel.WARN ) {
+        this.doLog( LogLevel.WARN, message, source );
 
-			this.printLine( `[${ source }] ${ message }`, 'color: #FF9933' );
+    }
 
-		} else if ( type >= this._logLevel && type === LogLevel.ERROR ) {
+    private doLog( type: LogLevel = LogLevel.ALL, message: string = '', source: string = 'Unknown' ): void {
 
-			this.printLine( `[${ source }] ${ message }`, 'color: #FF3333' );
+        if ( type >= this._logLevel && type === LogLevel.ALL ) {
 
-		} else if ( type >= this._logLevel && type === LogLevel.FATAL ) {
+            this.printLine( `[${ source }] ${ message }`, 'color: #000000' );
 
-			this.printLine( `[${ source }] ${ message }`, 'color: #FF3399' );
+        } else if ( type >= this._logLevel && type === LogLevel.DEBUG ) {
 
-		}
+            this.printLine( `[${ source }] ${ message }`, 'color: #00CC00' );
 
-	}
+        } else if ( type >= this._logLevel && type === LogLevel.VERBOSE ) {
 
-	// noinspection JSMethodCanBeStatic
-	private printLine( text: string = '', color: string = 'color: #000000' ): void {
+            this.printLine( `[${ source }] ${ message }`, 'color: #0080FF' );
+
+        } else if ( type >= this._logLevel && type === LogLevel.WARN ) {
+
+            this.printLine( `[${ source }] ${ message }`, 'color: #FF9933' );
+
+        } else if ( type >= this._logLevel && type === LogLevel.ERROR ) {
+
+            this.printLine( `[${ source }] ${ message }`, 'color: #FF3333' );
+
+        } else if ( type >= this._logLevel && type === LogLevel.FATAL ) {
+
+            this.printLine( `[${ source }] ${ message }`, 'color: #FF3399' );
+
+        }
+
+    }
+
+    // noinspection JSMethodCanBeStatic
+    private printLine( text: string = '', color: string = 'color: #000000' ): void {
 
 	    console.log( `%c${ text }`, color );
 
-	}
+    }
 
 }

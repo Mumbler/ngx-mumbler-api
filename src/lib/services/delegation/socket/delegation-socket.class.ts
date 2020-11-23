@@ -2,13 +2,13 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { EMPTY, Observable, Subscriber, throwError } from 'rxjs';
-import { fromPromise }                               from 'rxjs/internal-compatibility';
-import { MumblerIdPayload }                          from '../../mumble/payload/mumbler-id.payload';
-import { DelegationRequest }                         from '../../mumbler/requests/delegation.request';
-import { HeartbeatResponse }                         from '../../mumbler/response/heartbeat.response';
-import { WebSocketResponse }                         from '../../mumbler/response/web-socket.response';
-import { Mumble }                                    from './delegation.mumble.class';
+import { EMPTY, Observable, of, Subscriber, throwError } from 'rxjs';
+import { LoggerService }                                 from '../../common/logger.service';
+import { MumblerIdPayload }                              from '../../mumble/payload/mumbler-id.payload';
+import { DelegationRequest }                             from '../../mumbler/requests/delegation.request';
+import { HeartbeatResponse }                             from '../../mumbler/response/heartbeat.response';
+import { WebSocketResponse }                             from '../../mumbler/response/web-socket.response';
+import { Mumble }                                        from './delegation.mumble.class';
 
 export class DelegationSocket extends Observable< Mumble > {
 
@@ -52,36 +52,45 @@ export class DelegationSocket extends Observable< Mumble > {
                     // Try to de-serialize the mumble (which comes as a blob)
                     const raw: Blob = new Blob( [ event.data ] );
 
-                    fromPromise(
-                        raw.text()
-                    ).subscribe( ( message: string ) => {
+                    // Use FileReader due to the lack of Blob.text() support in iOS
+                    const reader: FileReader = new FileReader();
 
-                        const response: WebSocketResponse|Mumble = JSON.parse( message ) as WebSocketResponse|Mumble;
+                    reader.onload = () => {
 
-                        if ( !! response && 'success' in response && !! response.success && !! response.event ) {
+                        const message: string = reader.result as string;
 
-                            if ( response.event === 'delegation' ) {
+                        of( message ).subscribe( ( message: string ) => {
 
-                                // actually nothing to do here => success is checked above
+                            const response: WebSocketResponse|Mumble = JSON.parse( message ) as WebSocketResponse|Mumble;
 
-                            } else if ( response.event === 'heartbeat' ) {
+                            if ( !! response && 'success' in response && !! response.success && !! response.event ) {
 
-                                this._timeDeltaBackend = ( response as HeartbeatResponse ).heartbeat;
+                                if ( response.event === 'delegation' ) {
+
+                                    // actually nothing to do here => success is checked above
+
+                                } else if ( response.event === 'heartbeat' ) {
+
+                                    this._timeDeltaBackend = ( response as HeartbeatResponse ).heartbeat;
+
+                                }
+
+                            } else {
+
+                                // Now we can try to parse it into a mumble object (at least the public fields)
+                                subscriber.next( response as Mumble );
 
                             }
 
-                        } else {
+                        } );
 
-                            // Now we can try to parse it into a mumble object (at least the public fields)
-                            subscriber.next( response as Mumble );
+                    };
 
-                        }
-
-                    } );
+                    reader.readAsText( raw );
 
                 } catch ( e ) {
 
-                    subscriber.error( `Unable to de-serialize socket message` );
+                    subscriber.error( `Unable to de-serialize socket message: "${ LoggerService.ConvertToString( e ) }"` );
 
                 }
 
