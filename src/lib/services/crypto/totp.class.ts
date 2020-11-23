@@ -56,11 +56,11 @@ export class TotpClass {
      *  - tDelta ^= T_X
      *
      * @param tStart       The unix time from which to start counting steps (defaults to 1970)
-     * @param tDelta       The unix time intervals for which a single token is valid (defaults to 300 seconds)
+     * @param tDelta       The unix time intervals for which a single token is valid (defaults to 90 seconds)
      *
      * @returns {Observable<string>}
      */
-    private computeTotpToken( tStart: number = 0, tDelta: number = 300 ): Observable<string> {
+    private computeTotpToken( tStart: number = 0, tDelta: number = 90 ): Observable<string> {
 
         if ( tStart < 0 || tDelta < 0 ) {
 
