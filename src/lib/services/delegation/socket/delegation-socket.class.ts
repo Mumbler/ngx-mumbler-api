@@ -2,13 +2,14 @@
 ********* Copyright mumbler gmbh 2020 **********
 ************* All rights reserved **************
 ************************************************/
-import { EMPTY, Observable, of, Subscriber, throwError } from 'rxjs';
-import { LoggerService }                                 from '../../common/logger.service';
-import { MumblerIdPayload }                              from '../../mumble/payload/mumbler-id.payload';
-import { DelegationRequest }                             from '../../mumbler/requests/delegation.request';
-import { HeartbeatResponse }                             from '../../mumbler/response/heartbeat.response';
-import { WebSocketResponse }                             from '../../mumbler/response/web-socket.response';
-import { Mumble }                                        from './delegation.mumble.class';
+import { EMPTY, Observable, Subscriber, throwError } from 'rxjs';
+import { fromPromise }                               from 'rxjs/internal-compatibility';
+import { LoggerService }                             from '../../common/logger.service';
+import { MumblerIdPayload }                          from '../../mumble/payload/mumbler-id.payload';
+import { DelegationRequest }                         from '../../mumbler/requests/delegation.request';
+import { HeartbeatResponse }                         from '../../mumbler/response/heartbeat.response';
+import { WebSocketResponse }                         from '../../mumbler/response/web-socket.response';
+import { Mumble }                                    from './delegation.mumble.class';
 
 export class DelegationSocket extends Observable< Mumble > {
 
@@ -52,41 +53,66 @@ export class DelegationSocket extends Observable< Mumble > {
                     // Try to de-serialize the mumble (which comes as a blob)
                     const raw: Blob = new Blob( [ event.data ] );
 
-                    // Use FileReader due to the lack of Blob.text() support in iOS
-                    const reader: FileReader = new FileReader();
+                    fromPromise( raw.text() ).subscribe( ( message: string ) => {
 
-                    reader.onload = () => {
+                        const response: WebSocketResponse|Mumble = JSON.parse( message ) as WebSocketResponse|Mumble;
 
-                        const message: string = reader.result as string;
+                        if ( !! response && 'success' in response && !! response.success && !! response.event ) {
 
-                        of( message ).subscribe( ( message: string ) => {
+                            if ( response.event === 'delegation' ) {
 
-                            const response: WebSocketResponse|Mumble = JSON.parse( message ) as WebSocketResponse|Mumble;
+                                // actually nothing to do here => success is checked above
 
-                            if ( !! response && 'success' in response && !! response.success && !! response.event ) {
+                            } else if ( response.event === 'heartbeat' ) {
 
-                                if ( response.event === 'delegation' ) {
-
-                                    // actually nothing to do here => success is checked above
-
-                                } else if ( response.event === 'heartbeat' ) {
-
-                                    this._timeDeltaBackend = ( response as HeartbeatResponse ).heartbeat;
-
-                                }
-
-                            } else {
-
-                                // Now we can try to parse it into a mumble object (at least the public fields)
-                                subscriber.next( response as Mumble );
+                                this._timeDeltaBackend = ( response as HeartbeatResponse ).heartbeat;
 
                             }
 
-                        } );
+                        } else {
 
-                    };
+                            // Now we can try to parse it into a mumble object (at least the public fields)
+                            subscriber.next( response as Mumble );
 
-                    reader.readAsText( raw );
+                        }
+
+                    } );
+
+                    // // Use FileReader due to the lack of Blob.text() support in iOS
+                    // const reader: FileReader = new FileReader();
+                    //
+                    // reader.onload = () => {
+                    //
+                    //     const message: string = reader.result as string;
+                    //
+                    //     of( message ).subscribe( ( message: string ) => {
+                    //
+                    //         const response: WebSocketResponse|Mumble = JSON.parse( message ) as WebSocketResponse|Mumble;
+                    //
+                    //         if ( !! response && 'success' in response && !! response.success && !! response.event ) {
+                    //
+                    //             if ( response.event === 'delegation' ) {
+                    //
+                    //                 // actually nothing to do here => success is checked above
+                    //
+                    //             } else if ( response.event === 'heartbeat' ) {
+                    //
+                    //                 this._timeDeltaBackend = ( response as HeartbeatResponse ).heartbeat;
+                    //
+                    //             }
+                    //
+                    //         } else {
+                    //
+                    //             // Now we can try to parse it into a mumble object (at least the public fields)
+                    //             subscriber.next( response as Mumble );
+                    //
+                    //         }
+                    //
+                    //     } );
+                    //
+                    // };
+                    //
+                    // reader.readAsText( raw );
 
                 } catch ( e ) {
 
