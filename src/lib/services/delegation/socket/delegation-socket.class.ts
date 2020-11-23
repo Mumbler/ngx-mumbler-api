@@ -53,7 +53,8 @@ export class DelegationSocket extends Observable< Mumble > {
                     // Try to de-serialize the mumble (which comes as a blob)
                     const raw: Blob = new Blob( [ event.data ] );
 
-                    fromPromise( raw.text() ).subscribe( ( message: string ) => {
+                    // fromPromise( raw.text() ).subscribe( ( message: string ) => {
+                    fromPromise( new Response( raw ).text() ).subscribe( ( message: string ) => {
 
                         const response: WebSocketResponse|Mumble = JSON.parse( message ) as WebSocketResponse|Mumble;
 
