@@ -4,6 +4,7 @@
 ************************************************/
 import { EMPTY, Observable, Subscriber, throwError } from 'rxjs';
 import { fromPromise }                               from 'rxjs/internal-compatibility';
+import { LoggerService }                             from '../../common/logger.service';
 import { MumblerIdPayload }                          from '../../mumble/payload/mumbler-id.payload';
 import { DelegationRequest }                         from '../../mumbler/requests/delegation.request';
 import { HeartbeatResponse }                         from '../../mumbler/response/heartbeat.response';
@@ -81,7 +82,7 @@ export class DelegationSocket extends Observable< Mumble > {
 
                 } catch ( e ) {
 
-                    subscriber.error( `Unable to de-serialize socket message` );
+                    subscriber.error( `Unable to de-serialize socket message: "${ LoggerService.ConvertToString( e ) }"` );
 
                 }
 
